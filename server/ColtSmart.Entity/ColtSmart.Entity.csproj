@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ColtSmart.Core\ColtSmart.Core.csproj" />
+    <ProjectReference Include="..\ColtSmart.Data\ColtSmart.Data.csproj" />
+  </ItemGroup>
+
+</Project>
