@@ -1,9 +1,8 @@
 ﻿using ColtSmart.Data;
+using ColtSmart.Encrypt;
 using ColtSmart.Entity.Entities;
 using ColtSmart.Service.Service;
 using System.Linq;
-using System;
-using ColtSmart.Encrypt;
 
 namespace ColtSmart.Service.Impl
 {

@@ -2,6 +2,7 @@
 using MQTTnet.Client.Receiving;
 using MQTTnet.Server;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,6 +12,14 @@ namespace ColtSmart.MQTT.MQTT
                                      IMqttServerClientDisconnectedHandler, IMqttServerClientSubscribedTopicHandler,
                                      IMqttApplicationMessageReceivedHandler
     {
+        private IMqttServer mqttServer;
+        private ICollection<string> topicFilter = new List<string> { "device/#" };
+
+        public MqttServerHandler(IMqttServer mqttServer)
+        {
+            this.mqttServer = mqttServer;
+        }
+
         /// <summary>
         /// 绑定消息接收事件
         /// </summary>
@@ -19,6 +28,7 @@ namespace ColtSmart.MQTT.MQTT
         public Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
         {
             Console.WriteLine("收到来自客户端" +eventArgs.ClientId + "，主题为" + eventArgs.ApplicationMessage.Topic + "的消息：" + Encoding.UTF8.GetString(eventArgs.ApplicationMessage.Payload));
+           
 
             return Task.CompletedTask;
         }
@@ -33,6 +43,7 @@ namespace ColtSmart.MQTT.MQTT
             Console.WriteLine($"{eventArgs.ClientId}:建立MQTT连接！");
 
             return Task.CompletedTask;
+            //await this.mqttServer.SubscribeAsync(eventArgs.ClientId, null);
         }
 
         /// <summary>
@@ -43,8 +54,8 @@ namespace ColtSmart.MQTT.MQTT
         public Task HandleClientDisconnectedAsync(MqttServerClientDisconnectedEventArgs eventArgs)
         {
             Console.WriteLine($"{eventArgs.ClientId}:断开MQTT连接！");
-
             return Task.CompletedTask;
+            //await this.mqttServer.UnsubscribeAsync(eventArgs.ClientId, this.topicFilter);
         }
 
         /// <summary>
@@ -55,7 +66,7 @@ namespace ColtSmart.MQTT.MQTT
         public Task HandleClientSubscribedTopicAsync(MqttServerClientSubscribedTopicEventArgs eventArgs)
         {
             Console.WriteLine($"{eventArgs.ClientId}:订阅主题；{eventArgs.TopicFilter.Topic}");
-
+            
             return Task.CompletedTask;
         }
 

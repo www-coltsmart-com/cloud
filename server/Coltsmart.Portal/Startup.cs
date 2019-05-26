@@ -16,6 +16,7 @@ using System;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using ColtSmart.MQTT;
+using ColtSmart;
 
 namespace coltsmart.server
 {
@@ -78,6 +79,8 @@ namespace coltsmart.server
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseGlobalAppServiceProvider(Configuration);
             app.UseExceptionHandler(a => a.Run(async context =>
             {
                 var feature = context.Features.Get<IExceptionHandlerPathFeature>();

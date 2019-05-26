@@ -1,15 +1,13 @@
 ﻿using ColtSmart.MQTT.MQTT;
 using ColtSmart.MQTT.Options;
+using ColtSmart.Service.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MQTTnet;
 using MQTTnet.AspNetCore;
 using MQTTnet.Protocol;
 using MQTTnet.Server;
 using System;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 
 namespace ColtSmart.MQTT
 {
@@ -25,26 +23,37 @@ namespace ColtSmart.MQTT
                                                               .WithEncryptedEndpoint()
                                                               .WithConnectionValidator(t =>
                                                               {
-                                                                  if (t.Username != mqttOption.UserName || t.Password != mqttOption.Password)
+                                                                  if (!string.IsNullOrWhiteSpace(t.Username) && !string.IsNullOrWhiteSpace(t.Password))
                                                                   {
-                                                                      t.ReturnCode = MqttConnectReturnCode.ConnectionRefusedBadUsernameOrPassword;
+                                                                      var userService = EnjoyGlobals.ServiceProvider.GetService<IUserService>();
+
+                                                                      if (userService != null && userService.VerifyUser(t.Username, t.Password))
+                                                                      {
+                                                                          t.ReturnCode = MqttConnectReturnCode.ConnectionAccepted;
+                                                                      }
+                                                                      else
+                                                                      {
+                                                                          t.ReturnCode = MqttConnectReturnCode.ConnectionRefusedBadUsernameOrPassword;
+                                                                      }
                                                                   }
                                                                   else
                                                                   {
-                                                                      t.ReturnCode = MqttConnectReturnCode.ConnectionAccepted;
+                                                                      t.ReturnCode = MqttConnectReturnCode.ConnectionRefusedNotAuthorized;
                                                                   }
                                                               });
             
             
             var options = optionBuilder.Build();
 
-            var certificate = new X509Certificate2(@"C:\certs\test\test.cer", "", X509KeyStorageFlags.Exportable);
-            options.TlsEndpointOptions.Certificate = certificate.Export(X509ContentType.Pfx);
-            options.TlsEndpointOptions.IsEnabled = true;
+            //var certificate = new X509Certificate2(@"C:\certs\test\test.cer", "", X509KeyStorageFlags.Exportable);
+            //options.TlsEndpointOptions.Certificate = certificate.Export(X509ContentType.Pfx);
+            //options.TlsEndpointOptions.IsEnabled = true;
 
             services.AddHostedMqttServer(options)
                     .AddMqttConnectionHandler()
                     .AddConnections();
+
+            
 
             return services;
         }
@@ -59,7 +68,7 @@ namespace ColtSmart.MQTT
             app.UseMqttEndpoint("/data");
             app.UseMqttServer(server => 
              {
-                 var mqttHandler = new MqttServerHandler();
+                 var mqttHandler = new MqttServerHandler(server);
 
                  server.StartedHandler = mqttHandler;
                  server.StoppedHandler = mqttHandler;

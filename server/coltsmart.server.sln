@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MQTT", "MQTT", "{7C5DEBB3-4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ColtSmart.MQTT", "MQTT\ColtSmart.MQTT\ColtSmart.MQTT.csproj", "{B8212C44-F08A-49CF-91EF-26E9813F1506}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColtSmart.MQTT.Service", "MQTT\ColtSmart.MQTT.Service\ColtSmart.MQTT.Service.csproj", "{82F8259A-A030-4A0E-A94F-E936C425E1F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,12 +67,17 @@ Global
 		{B8212C44-F08A-49CF-91EF-26E9813F1506}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8212C44-F08A-49CF-91EF-26E9813F1506}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8212C44-F08A-49CF-91EF-26E9813F1506}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82F8259A-A030-4A0E-A94F-E936C425E1F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82F8259A-A030-4A0E-A94F-E936C425E1F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82F8259A-A030-4A0E-A94F-E936C425E1F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82F8259A-A030-4A0E-A94F-E936C425E1F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B8212C44-F08A-49CF-91EF-26E9813F1506} = {7C5DEBB3-48BF-4156-8A26-62C1110357AB}
+		{82F8259A-A030-4A0E-A94F-E936C425E1F6} = {7C5DEBB3-48BF-4156-8A26-62C1110357AB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E762D13F-1D30-4EFB-BDED-AA4933D53695}

@@ -22,8 +22,8 @@ namespace ColtSmart.Entity
 
         public string UserOwn { get; set; }
 
-        public string NetFlow { get; set; }
+        public int ComPortNum { get; set; }
 
-        public string GpsCoordinate { get; set; }
+        public string Version { get; set; }
     }
 }
