@@ -19,10 +19,10 @@ namespace Coltsmart.Portal.Controllers
             {
                 CurrentPage = page,
                 PageSize = size,
-                TotalCount = Devices.Count
+                //TotalCount = Devices.Count
             };
 
-            pr.Result = Devices.Skip((page - 1) * size).Take(size);
+            //pr.Result = Devices.Skip((page - 1) * size).Take(size);
 
             return pr;
         }
@@ -34,347 +34,347 @@ namespace Coltsmart.Portal.Controllers
             return 0;
         }
 
-        public static List<Device> Devices = new List<Device>
-                {
-                     new Device
-                     {
-                         Id=100,
-                         DeviceId ="2019042300000001",
-                         DeviceType ="MJ-4GDTU",
-                         IsGetway=false,
-                         DeviceName="终端001",
-                         IsOnline=true,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="刘晓东",
-                         NetFlow="10.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     },
-                     new Device
-                     {
-                         Id=101,
-                         DeviceId ="2019042300000002",
-                         DeviceType ="MJ-LoRaDTU",
-                         IsGetway=true,
-                         DeviceName="终端002",
-                         IsOnline=false,
-                         InDate=System.DateTime.Now.Date,
-                         UserOwn="马威",
-                         NetFlow="30.1KB",
-                         GpsCoordinate="N/A"
-                     }
-                };
+        //public static List<Device> Devices = new List<Device>
+        //        {
+        //             new Device
+        //             {
+        //                 Id=100,
+        //                 DeviceId ="2019042300000001",
+        //                 DeviceType ="MJ-4GDTU",
+        //                 IsGetway=false,
+        //                 DeviceName="终端001",
+        //                 IsOnline=true,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="刘晓东",
+        //                 NetFlow="10.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             },
+        //             new Device
+        //             {
+        //                 Id=101,
+        //                 DeviceId ="2019042300000002",
+        //                 DeviceType ="MJ-LoRaDTU",
+        //                 IsGetway=true,
+        //                 DeviceName="终端002",
+        //                 IsOnline=false,
+        //                 InDate=System.DateTime.Now.Date,
+        //                 UserOwn="马威",
+        //                 NetFlow="30.1KB",
+        //                 GpsCoordinate="N/A"
+        //             }
+        //        };
     
     }
 }

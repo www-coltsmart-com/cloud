@@ -1,5 +1,6 @@
 ﻿using ColtSmart.MQTT.MQTT;
 using ColtSmart.MQTT.Options;
+using ColtSmart.Service;
 using ColtSmart.Service.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -68,7 +69,8 @@ namespace ColtSmart.MQTT
             app.UseMqttEndpoint("/data");
             app.UseMqttServer(server => 
              {
-                 var mqttHandler = new MqttServerHandler(server);
+                 var deviceService= EnjoyGlobals.ServiceProvider.GetService<IDeviceService>();
+                 var mqttHandler = new MqttServerHandler(server, deviceService);
 
                  server.StartedHandler = mqttHandler;
                  server.StoppedHandler = mqttHandler;

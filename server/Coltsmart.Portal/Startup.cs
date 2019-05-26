@@ -66,6 +66,8 @@ namespace coltsmart.server
 
             builder.RegisterDbExecutor(b => b.UsePostgre().UseConnectionString(ConfigurationVariables.Default.ConnectionString));
             builder.RegisterAssemblyTypes(typeof(UserService).Assembly).AsImplementedInterfaces();
+            builder.RegisterAssemblyTypes(typeof(DeviceService).Assembly).AsImplementedInterfaces();
+
             this.ApplicationContainer = builder.Build();
             
             return new AutofacServiceProvider(this.ApplicationContainer);
