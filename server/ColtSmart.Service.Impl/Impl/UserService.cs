@@ -4,6 +4,7 @@ using ColtSmart.Service.Service;
 using System.Linq;
 using System;
 using ColtSmart.Encrypt;
+using System.Text;
 
 namespace ColtSmart.Service.Impl
 {
@@ -35,9 +36,9 @@ namespace ColtSmart.Service.Impl
         public bool VerifyUser(string usercode, string password)
         {
             var user = sqlExecutor.Find<TUser>(new { UserNo = usercode }).FirstOrDefault();
-            var encrptPassword= EncryptHelper.Instance.PassEncryption(usercode, password);
+            var encrptPassword = EncryptHelper.Instance.PassEncryption(usercode, password);
 
-            var ret= user != null && user.Password == encrptPassword;
+            var ret = user != null && user.Password == encrptPassword;
             return ret;
         }
 
@@ -45,6 +46,28 @@ namespace ColtSmart.Service.Impl
         {
             var user = sqlExecutor.Find<TUser>(new { UserNo = userno }).FirstOrDefault();
             return user;
+        }
+
+        public PagedResult<TUser> GetUsers(int page, int pageSize, string userName)
+        {
+            StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM tuser");
+            object param = null;
+            if (!string.IsNullOrEmpty(userName))
+            {
+                sqlBuilder.Append(" WHERE \"UserName\" like @UserName");
+                param = new { UserName = string.Format("{0}%", userName.Trim()) };
+            }
+            return sqlExecutor.QueryPage<TUser>(sqlBuilder.ToString(), page, pageSize, param).ToPagedResult();
+        }
+
+        public int DeleteUser(int id)
+        {
+            TUser user = sqlExecutor.Find<TUser>(new { Id = id }).FirstOrDefault();
+            if (user != null)
+            {
+                return sqlExecutor.Delete<TUser>(user);
+            }
+            return 0;
         }
     }
 }
