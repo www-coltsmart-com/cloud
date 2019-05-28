@@ -31,14 +31,12 @@ namespace ColtSmart.MQTT.MQTT
         /// </summary>
         /// <param name="eventArgs"></param>
         /// <returns></returns>
-        public Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
+        public async Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
         {
             var recvMsg = Encoding.UTF8.GetString(eventArgs.ApplicationMessage.Payload);
             Console.WriteLine("收到来自客户端" +eventArgs.ClientId + "，主题为" + eventArgs.ApplicationMessage.Topic + "的消息：" + recvMsg);
 
-            eventArgs.ProcessingFailed= this.ProcessReceiveMessage(eventArgs.ApplicationMessage.Topic, eventArgs.ClientId, recvMsg);
-
-            return Task.CompletedTask;
+            eventArgs.ProcessingFailed=await this.ProcessReceiveMessage(eventArgs.ApplicationMessage.Topic, eventArgs.ClientId, recvMsg);
         }
 
 
@@ -49,7 +47,7 @@ namespace ColtSmart.MQTT.MQTT
         /// <param name="clientId">设备Id</param>
         /// <param name="reciveMsg">接收消息</param>
         /// <returns></returns>
-        private bool ProcessReceiveMessage(string topic,string clientId,string reciveMsg)
+        private async Task<bool> ProcessReceiveMessage(string topic,string clientId,string reciveMsg)
         {
             var processingFailed = true;
 
@@ -64,7 +62,7 @@ namespace ColtSmart.MQTT.MQTT
 
                         if (!string.IsNullOrWhiteSpace(tInFo.Item2))
                         {
-                            this.ProcessDeviceSetup(clientId, tInFo.Item2, dSetup);
+                          await this.ProcessDeviceSetup(clientId, tInFo.Item2, dSetup);
                             processingFailed = false;
                         }
                         break;
@@ -109,11 +107,11 @@ namespace ColtSmart.MQTT.MQTT
         /// <param name="deviceId">设备Id</param>
         /// <param name="deviceOwn">设备所有人</param>
         /// <param name="deviceSetup">设备信息</param>
-        private void ProcessDeviceSetup(string deviceId,string deviceOwn,DeviceSetup deviceSetup)
+        private async Task ProcessDeviceSetup(string deviceId,string deviceOwn,DeviceSetup deviceSetup)
         {
             if (this.deviceService.GetDevice(deviceId,deviceOwn) == null)
             {
-                this.deviceService.Insert(new Entity.Device
+                await this.deviceService.Insert(new Entity.Device
                 {
                     #region
                     ComPortNum = deviceSetup.ComPortNum,

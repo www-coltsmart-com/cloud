@@ -1,41 +1,66 @@
 ﻿using ColtSmart.Data;
 using ColtSmart.Entity;
+using Microsoft.Extensions.Configuration;
+using Npgsql;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ColtSmart.Service.Impl
 {
     public class DeviceService: IDeviceService
     {
         private readonly ISqlExecutor sqlExecutor;
+        private readonly IConfiguration configuration;
 
-        public DeviceService(ISqlExecutor sqlExecutor)
+        public DeviceService(ISqlExecutor sqlExecutor, IConfiguration configuration)
         {
             this.sqlExecutor = sqlExecutor;
+            this.configuration = configuration;
         }
 
-        public Device GetDevice(string deviceId)
+        public async Task<Device> GetDevice(string deviceId)
         {
-            var device= sqlExecutor.Find<Device>(new { DeviceId = deviceId }).FirstOrDefault();
+            var connectionString = this.GetConnection();
 
-            return device;
+            using (var con = new NpgsqlConnection(connectionString))
+            {
+                var device = await con.FindAsync<Device>(new { DeviceId = deviceId});
+
+                return device.FirstOrDefault();
+            }
         }
 
-        public Device GetDevice(string deviceId, string userNo)
+        public async Task<Device> GetDevice(string deviceId, string userNo)
         {
-            var device = sqlExecutor.Find<Device>(new { DeviceId = deviceId, UserOwn=userNo }).FirstOrDefault();
+            var connectionString = this.GetConnection();
 
-            return device;
+            using (var con = new NpgsqlConnection(connectionString))
+            {
+                var device = await con.FindAsync<Device>(new { DeviceId = deviceId, UserOwn = userNo });
+
+                return device.FirstOrDefault();
+            }
         }
 
-        public void Insert(Device device)
+        public async Task Insert(Device device)
         {
-           // device.Id= sqlExecutor.GetId("device");
-            sqlExecutor.Insert<Device>(device);
+            var connectionString = this.GetConnection();
+
+            using (var con = new NpgsqlConnection(connectionString))
+            {
+              await  con.InsertAsync<Device>(device);
+            }
         }
 
         public void Update(Device device)
         {
             throw new System.NotImplementedException();
+        }
+
+        public string GetConnection()
+        {
+            var connection = configuration.GetSection("ConnectionString").Value;
+            return connection;
         }
     }
 }

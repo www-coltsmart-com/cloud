@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using ColtSmart.MQTT;
 using ColtSmart;
+using ColtSmart.Data;
 
 namespace coltsmart.server
 {
@@ -60,10 +61,10 @@ namespace coltsmart.server
             services.AddColtSmartMQTT(Configuration);
 
             ConfigurationVariables.Default = Configuration.BuildConfigurationVariables();
-
+            
             var builder = new ContainerBuilder();
             builder.Populate(services);
-
+            
             builder.RegisterDbExecutor(b => b.UsePostgre().UseConnectionString(ConfigurationVariables.Default.ConnectionString));
             builder.RegisterAssemblyTypes(typeof(UserService).Assembly).AsImplementedInterfaces();
             builder.RegisterAssemblyTypes(typeof(DeviceService).Assembly).AsImplementedInterfaces();

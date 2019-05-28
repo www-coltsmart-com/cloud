@@ -18,7 +18,7 @@ namespace ColtSmart.Data
         {
             get
             {
-                _connection = _connection ?? this._dbProviderFactory.CreateConnection();
+                _connection = _connection?? this._dbProviderFactory.CreateConnection();
 
                 if (string.IsNullOrWhiteSpace(_connection.ConnectionString))
                 {
@@ -241,7 +241,7 @@ namespace ColtSmart.Data
 
         public async Task<int> InsertAsync<T>(T entityToInsert, IDbTransaction transaction = null, int? commandTimeout = null)
         {
-            return await this.Connection.InsertAsync<T>(entityToInsert, transaction, commandTimeout);
+                return await this.Connection.InsertAsync<T>(entityToInsert, transaction, commandTimeout);
         }
 
         public int Update<T>(T entityToUpdate, IDbTransaction transaction = null, int? commandTimeout = null)

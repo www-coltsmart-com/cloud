@@ -1,15 +1,16 @@
 ﻿using ColtSmart.Entity;
+using System.Threading.Tasks;
 
 namespace ColtSmart.Service
 {
     public interface IDeviceService
     {
-        Device GetDevice(string deviceId);
+        Task<Device> GetDevice(string deviceId);
 
-        Device GetDevice(string deviceId, string userNo);
+        Task<Device> GetDevice(string deviceId, string userNo);
 
         void Update(Device device);
 
-        void Insert(Device device);
+        Task Insert(Device device);
     }
 }
