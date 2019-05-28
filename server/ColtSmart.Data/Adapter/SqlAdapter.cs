@@ -40,7 +40,7 @@ namespace ColtSmart.Data.Adapter
             //var cmd = new StringBuilder(PartsQryGenerator.InsertQuery(tableInfo));
             //return connection.Execute(cmd.ToString(), entityToInsert, transaction, commandTimeout);
 
-            var cmd = new StringBuilder(PartsQryGenerator.InsertQuery(tableInfo)).Append("; ").Append(QueryLastId);
+            var cmd = new StringBuilder(PartsQryGenerator.InsertQuery(tableInfo)).Append(QueryLastId);
             var multi = connection.QueryMultiple(cmd.ToString(), entityToInsert, transaction, commandTimeout);
 
             var first = multi.Read().FirstOrDefault();

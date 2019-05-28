@@ -1,7 +1,5 @@
 ﻿using ColtSmart.Data;
 using ColtSmart.Entity;
-using Microsoft.Extensions.Configuration;
-using Npgsql;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,57 +8,58 @@ namespace ColtSmart.Service.Impl
     public class DeviceService: IDeviceService
     {
         private readonly ISqlExecutor sqlExecutor;
-        private readonly IConfiguration configuration;
 
-        public DeviceService(ISqlExecutor sqlExecutor, IConfiguration configuration)
+        public DeviceService(DbOptions dbOptions)
         {
-            this.sqlExecutor = sqlExecutor;
-            this.configuration = configuration;
+            this.sqlExecutor = new SqlExecutor(dbOptions);
         }
 
         public async Task<Device> GetDevice(string deviceId)
         {
-            var connectionString = this.GetConnection();
+            var device = await this.sqlExecutor.FindAsync<Device>(new { DeviceId = deviceId });
 
-            using (var con = new NpgsqlConnection(connectionString))
-            {
-                var device = await con.FindAsync<Device>(new { DeviceId = deviceId});
+            return device.FirstOrDefault();
 
-                return device.FirstOrDefault();
-            }
+            //var connectionString = this.GetConnection();
+
+            //using (var con = new NpgsqlConnection(connectionString))
+            //{
+            //    var device = await con.FindAsync<Device>(new { DeviceId = deviceId});
+
+            //    return device.FirstOrDefault();
+            //}
         }
 
         public async Task<Device> GetDevice(string deviceId, string userNo)
         {
-            var connectionString = this.GetConnection();
+            var device = await this.sqlExecutor.FindAsync<Device>(new { DeviceId = deviceId, UserOwn = userNo });
 
-            using (var con = new NpgsqlConnection(connectionString))
-            {
-                var device = await con.FindAsync<Device>(new { DeviceId = deviceId, UserOwn = userNo });
+            return device.FirstOrDefault();
+            //var connectionString = this.GetConnection();
 
-                return device.FirstOrDefault();
-            }
+            //using (var con = new NpgsqlConnection(connectionString))
+            //{
+            //    var device = await con.FindAsync<Device>(new { DeviceId = deviceId, UserOwn = userNo });
+
+            //    return device.FirstOrDefault();
+            //}
         }
 
         public async Task Insert(Device device)
         {
-            var connectionString = this.GetConnection();
+            await this.sqlExecutor.InsertAsync<Device>(device);
 
-            using (var con = new NpgsqlConnection(connectionString))
-            {
-              await  con.InsertAsync<Device>(device);
-            }
+            //var connectionString = this.GetConnection();
+
+            //using (var con = new NpgsqlConnection(connectionString))
+            //{
+            //    await con.InsertAsync<Device>(device);
+            //}
         }
 
         public void Update(Device device)
         {
             throw new System.NotImplementedException();
-        }
-
-        public string GetConnection()
-        {
-            var connection = configuration.GetSection("ConnectionString").Value;
-            return connection;
         }
     }
 }

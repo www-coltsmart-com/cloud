@@ -109,7 +109,7 @@ namespace ColtSmart.MQTT.MQTT
         /// <param name="deviceSetup">设备信息</param>
         private async Task ProcessDeviceSetup(string deviceId,string deviceOwn,DeviceSetup deviceSetup)
         {
-            if (this.deviceService.GetDevice(deviceId,deviceOwn) == null)
+            if (await this.deviceService.GetDevice(deviceId,deviceOwn) == null)
             {
                 await this.deviceService.Insert(new Entity.Device
                 {
