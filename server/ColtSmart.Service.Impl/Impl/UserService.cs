@@ -69,5 +69,21 @@ namespace ColtSmart.Service.Impl
             }
             return 0;
         }
+
+        public IResult RegisterUser(TUser user)
+        {
+            var retUser = sqlExecutor.Find<TUser>(new { UserNo = user.UserNo }).FirstOrDefault();
+            if (retUser != null)
+                return new ErrorResult<string>("用户名已存在，请重新输入一个新的用户名");
+            if (string.IsNullOrEmpty(user.Password))
+                return new ErrorResult<string>("密码不能为空");
+            user.UserName = string.IsNullOrEmpty(user.UserName) ? "注册用户" : user.UserName.Trim();
+            //密码加密后保存
+            user.Password = EncryptHelper.Instance.PassEncryption(user.UserNo, user.Password.Trim());
+            user.RegDate = DateTime.Now;
+            user.UserType = EUserType.Custom;//注册入口均为普通用户，管理员为后台手工分配
+            int result = sqlExecutor.Insert<TUser>(user);
+            return new BaseResult<int>(result);
+        }
     }
 }

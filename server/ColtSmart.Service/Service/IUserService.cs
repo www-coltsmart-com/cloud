@@ -13,5 +13,7 @@ namespace ColtSmart.Service.Service
         PagedResult<TUser> GetUsers(int page, int pageSize, string userName);
 
         int DeleteUser(int id);
+
+        IResult RegisterUser(TUser user);
     }
 }
