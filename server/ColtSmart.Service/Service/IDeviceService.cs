@@ -9,7 +9,7 @@ namespace ColtSmart.Service
 
         Task<Device> GetDevice(string deviceId, string userNo);
 
-        void Update(Device device);
+        Task Update(Device device);
 
         Task Insert(Device device);
     }

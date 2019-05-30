@@ -21,7 +21,7 @@
     <ProjectReference Include="..\ColtSmart.Service.Impl\ColtSmart.Service.Impl.csproj" />
     <ProjectReference Include="..\ColtSmart.Service\ColtSmart.Service.csproj" />
     <ProjectReference Include="..\ColtSmart\ColtSmart.csproj" />
-    <ProjectReference Include="..\MQTT\ColtSmart.MQTT\ColtSmart.MQTT.csproj" />
+    <ProjectReference Include="..\MQTT\ColtSmart.MQTT.Client\ColtSmart.MQTT.Client.csproj" />
   </ItemGroup>
 
 </Project>

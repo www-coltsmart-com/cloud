@@ -1,23 +1,22 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Coltsmart.NetCore.Extensions;
+using ColtSmart;
+using ColtSmart.Core;
 using ColtSmart.JWT;
+using ColtSmart.MQTT.Client;
+using ColtSmart.Service.Impl;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.WebApiCompatShim;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Coltsmart.NetCore.Extensions;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using ColtSmart.Core;
-using ColtSmart.Service.Impl;
 using System;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
-using ColtSmart.MQTT;
-using ColtSmart;
-using ColtSmart.Data;
+using System.Text;
 
 namespace coltsmart.server
 {

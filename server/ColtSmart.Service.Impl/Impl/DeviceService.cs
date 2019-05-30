@@ -19,15 +19,6 @@ namespace ColtSmart.Service.Impl
             var device = await this.sqlExecutor.FindAsync<Device>(new { DeviceId = deviceId });
 
             return device.FirstOrDefault();
-
-            //var connectionString = this.GetConnection();
-
-            //using (var con = new NpgsqlConnection(connectionString))
-            //{
-            //    var device = await con.FindAsync<Device>(new { DeviceId = deviceId});
-
-            //    return device.FirstOrDefault();
-            //}
         }
 
         public async Task<Device> GetDevice(string deviceId, string userNo)
@@ -35,31 +26,30 @@ namespace ColtSmart.Service.Impl
             var device = await this.sqlExecutor.FindAsync<Device>(new { DeviceId = deviceId, UserOwn = userNo });
 
             return device.FirstOrDefault();
-            //var connectionString = this.GetConnection();
-
-            //using (var con = new NpgsqlConnection(connectionString))
-            //{
-            //    var device = await con.FindAsync<Device>(new { DeviceId = deviceId, UserOwn = userNo });
-
-            //    return device.FirstOrDefault();
-            //}
         }
 
         public async Task Insert(Device device)
         {
             await this.sqlExecutor.InsertAsync<Device>(device);
-
-            //var connectionString = this.GetConnection();
-
-            //using (var con = new NpgsqlConnection(connectionString))
-            //{
-            //    await con.InsertAsync<Device>(device);
-            //}
         }
 
-        public void Update(Device device)
+        public async Task Update(Device device)
         {
-            throw new System.NotImplementedException();
+            await this.sqlExecutor.ExecuteAsync("upddate device set \"DeviceType\"=@DeviceType, \"IsGetway\" =@IsGetway, \"DeviceName\" =@DeviceName, \"IsOnline\" =@IsOnline, \"InDate\" =@InDate, \"UserOwn\" =@UserOwn, \"Gps\" =@Gps, \"Version\" =@Version, \"ComPortNum\" =@ComPortNum where DeviceId=@DeviceId", new
+            {
+                #region
+                DeviceId = device.DeviceId,
+                DeviceType=device.DeviceType,
+                IsGetway=device.IsGetway,
+                DeviceName=device.DeviceName,
+                IsOnline=device.IsOnline,
+                InDate=device.InDate,
+                UserOwn=device.UserOwn,
+                Gps=device.Gps,
+                Version=device.Version,
+                ComPortNum=device.ComPortNum
+                #endregion
+            }, commandType: System.Data.CommandType.Text);
         }
     }
 }

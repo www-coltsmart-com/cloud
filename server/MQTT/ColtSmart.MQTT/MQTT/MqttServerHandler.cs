@@ -109,23 +109,29 @@ namespace ColtSmart.MQTT.MQTT
         /// <param name="deviceSetup">设备信息</param>
         private async Task ProcessDeviceSetup(string deviceId,string deviceOwn,DeviceSetup deviceSetup)
         {
-            if (await this.deviceService.GetDevice(deviceId,deviceOwn) == null)
+            var device=  new Entity.Device
             {
-                await this.deviceService.Insert(new Entity.Device
-                {
-                    #region
-                    ComPortNum = deviceSetup.ComPortNum,
-                    DeviceName =deviceId,
-                    DeviceType =deviceSetup.DevType,
-                    InDate =DateTime.Now,
-                    DeviceId =deviceId,
-                    IsGetway =deviceSetup.IsGateway,
-                    IsOnline =true,
-                    Gps =deviceSetup.GPS,
-                    UserOwn =deviceOwn,
-                    Version =deviceSetup.Version
-                    #endregion
-                });
+                #region
+                ComPortNum = deviceSetup.ComPortNum,
+                DeviceName = deviceId,
+                DeviceType = deviceSetup.DevType,
+                InDate = DateTime.Now,
+                DeviceId = deviceId,
+                IsGetway = deviceSetup.IsGateway,
+                IsOnline = true,
+                Gps = deviceSetup.GPS,
+                UserOwn = deviceOwn,
+                Version = deviceSetup.Version
+                #endregion
+            };
+
+            if (await this.deviceService.GetDevice(deviceId) == null)
+            {
+                await this.deviceService.Insert(device);
+            }
+            else
+            {
+                await this.deviceService.Update(device);
             }
         }
         #endregion
