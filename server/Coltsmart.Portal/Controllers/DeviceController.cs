@@ -1,10 +1,7 @@
 ﻿using ColtSmart.Entity;
 using ColtSmart.Service;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Web.Http;
-using System.Linq;
-using ColtSmart.Service.Service;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
