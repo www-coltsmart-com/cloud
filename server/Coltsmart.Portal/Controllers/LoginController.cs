@@ -12,7 +12,7 @@ using System.Web.Http;
 
 namespace coltsmart.server.Controllers
 {
-    public class LoginController: ApiController
+    public class LoginController : ApiController
     {
         private IUserService userService = null;
         private readonly DbOptions dbOptions = null;
@@ -20,7 +20,7 @@ namespace coltsmart.server.Controllers
 
         public object EncryptionManager { get; private set; }
 
-        public LoginController(IUserService userService,DbOptions dbOptions, IMemoryCache cache)
+        public LoginController(IUserService userService, DbOptions dbOptions, IMemoryCache cache)
         {
             this.userService = userService;
             this.dbOptions = dbOptions;
@@ -57,19 +57,19 @@ namespace coltsmart.server.Controllers
         [Route("api/Login/userinfo")]
         public dynamic UserInfo(string userName)
         {
-           var user= userService.GetUser(userName);
+            var user = userService.GetUser(userName);
 
             if (user != null)
             {
                 return new
                 {
                     Id = user.Id,
-                    IsAdmin = user.UserType== EUserType.Admin,
+                    IsAdmin = user.UserType == EUserType.Admin,
                     TotalDevice = 1000,
                     TotalUser = 140,
                     OnlineDevice = 340,
                     EMail = user.RegEmall,
-                    MobilePhone =user.MobilePhone,
+                    MobilePhone = user.MobilePhone,
                     Company = user.Company,
                     RegDate = user.RegDate
                 };
@@ -108,6 +108,26 @@ namespace coltsmart.server.Controllers
             }
 
             return keyPair["PEMPUBLIC"];
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("api/Login/savereg")]
+        public ActionResult Register([FromBody]TUser user)
+        {
+            Dictionary<string, string> keyPair = null;
+            if (cache.Get("RSAKEYPAIR") == null)
+            {
+                keyPair = EncryptionProvider.CreateRsaKeyPair();
+                cache.Set("RSAKEYPAIR", keyPair, new DateTimeOffset(DateTime.Now.AddMinutes(10)));
+            }
+            else
+            {
+                keyPair = cache.Get("RSAKEYPAIR") as Dictionary<string, string>;
+            }
+            //Ω‚√‹µ«¬º√‹¬Î
+            user.Password = EncryptionProvider.DecryptRSA(user.Password, keyPair["PRIVATE"]);
+            return Json(userService.RegisterUser(user));
         }
     }
 }

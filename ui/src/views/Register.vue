@@ -11,22 +11,28 @@
         <div style="height:80px;" class="hidden-lg-and-down"></div>
         <div style="height:80px;" ></div>
         <el-card class="login-box" >
-            <el-form :model="RegisterInfo" ref="RegisterInfo" :rules="RegisterRules" status-icon label-width="0px"> 
-            <h1 class="title">昂捷部署平台注册</h1>
+            <el-form :model="RegisterUser" ref="RegisterUser" :rules="RegisterRules" status-icon label-width="0px"> 
+            <h1 class="title">立即注册</h1>
               <p class="login-box-msg"></p>
               
-            <el-form-item label="" prop="Use">
-              <el-select ref="selectInput" v-model="RegisterInfo.Use" style="width:100%" auto-complete="off" placeholder="请选择平台用途">
-                <el-option v-for="item in Useage.Options" :key="item.Code" :label="item.Name" :value="item.Code"></el-option>
-              </el-select>
+            <el-form-item label="" prop="UserNo">
+              <el-input type="text" v-model="RegisterUser.UserNo" auto-complete="off" placeholder="请输入用户名" ></el-input>
             </el-form-item>
-            <el-form-item label="" prop="No">
-              <el-input type="text" v-model="RegisterInfo.No" auto-complete="off" placeholder="请输入客户代码" ></el-input>
-            </el-form-item>
-            <el-form-item prop="RegPassword">
-              <el-input :type="PassEye" v-model="RegisterInfo.RegPassword" auto-complete="off" placeholder="请输入注册密码">
+            <el-form-item prop="Password">
+              <el-input :type="PassEye" v-model="RegisterUser.Password" auto-complete="off" placeholder="请输入密码">
                <i slot="suffix" class="el-icon-view" @mousedown="PassEye= ''" @mouseup="PassEye='password'"></i>
                </el-input>
+            </el-form-item>
+            <el-form-item prop="ConfirmPassword">
+              <el-input :type="PassEye" v-model="RegisterUser.ConfirmPassword" auto-complete="off" placeholder="请再输入一遍密码">
+               <i slot="suffix" class="el-icon-view" @mousedown="PassEye= ''" @mouseup="PassEye='password'"></i>
+               </el-input>
+            </el-form-item>
+            <el-form-item label="" prop="Company">
+              <el-input type="text" v-model="RegisterUser.Company" auto-complete="off" placeholder="公司名称" ></el-input>
+            </el-form-item>
+            <el-form-item label="" prop="MobilePhone">
+              <el-input type="text" v-model="RegisterUser.MobilePhone" auto-complete="off" placeholder="联系电话" ></el-input>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="submitForm" :loading="loading" style="width:100%">立即注册</el-button>
@@ -43,7 +49,7 @@
   <el-row type="flex" justify="center">
     <el-col :span="12">
         <div class="login-bottom" >
-          <span> ©&nbsp;2018 &nbsp;&nbsp; 深圳市昂捷信息技术股份有限公司 &nbsp;&nbsp; 技术支持 </span>
+          <span> ©&nbsp;2018 &nbsp;&nbsp; 上海市鸣驹智能科技有限公司 &nbsp;&nbsp; 技术支持 </span>
         </div>
       </el-col>
   </el-row>
@@ -57,51 +63,55 @@ import 'element-ui/lib/theme-chalk/display.css';
 export default {
   name: 'register',
   data: function () {
-    const validateClientCode = (rule, value, callback) => {
-      if (value.length <= 0) {
-        callback(new Error('请输入正确的客户编码'))
-      } else {
-        callback()
-      }
-    }
-    const validateRegCode = (rule, value, callback) => {
-      if (value.length !=36) {
-        callback(new Error('注册码必须为36位'))
-      } else {
+    const validateUserNo = (rule,value,callback)=>{
+      if(value.length<=0){
+        callback(new Error('用户名不能为空'))
+      }else{
         callback()
       }
     }
     const validatePass = (rule, value, callback) => {
-      if (value.length < 5) {
+      if (value === '' || value.length < 5) {
         callback(new Error('密码不能小于5位'))
       } else {
+        if(this.RegisterUser.ConfirmPassword !== ''){
+          this.$refs.RegisterUser.validateField('ConfirmPassword');
+        }
+        callback()
+      }
+    }
+    const validateConfirmPass = (rule,value,callback)=>{
+      if(value === '' || value.length < 5 ){
+        callback(new Error('确认密码无效，请重新输入'))
+      }else if(value != this.RegisterUser.Password){
+        callback(new Error('两次密码输入不一致'))
+      }else{
         callback()
       }
     }
     return {
       PassEye: 'password',
       loading:false,
-      RegisterInfo:{
-        No:'',
-        Use:''
+      RegisterUser:{
+        UserNo:'',
+        Password:'',
+        ConfirmPassword:'',
+        Company:'',
+        MobilePhone:''
       },
       RegisterRules: {
-        No: [{required: true, trigger: 'blur', validator: validateClientCode}],
-        Use: [{required: true, trigger: 'blur', message: "请选择平台用途" }],
-        RegPassword: [{required: true, trigger: 'blur', validator: validatePass}]
-      },
-      Useage:{
-        Options:[{Code:'测试',Name:'测试'},{Code:'正式',Name:'正式'}]
+        UserNo: [{required: true, trigger: 'blur', validator: validateUserNo}],
+        Password: [{required: true, trigger: 'blur', validator: validatePass}],
+        ConfirmPassword:[{required:true,trigger:'blur',validator:validateConfirmPass}]
       }
     }
   },
   methods: {
     submitForm () {
-      this.$refs['RegisterInfo'].validate((valid) => {
+      this.$refs['RegisterUser'].validate((valid) => {
         if (valid) {
           this.saveRegistration()
         } else {
-          // console.log('error submit!!')
           return false
         }
       })
@@ -109,29 +119,46 @@ export default {
     redirect:function(){
       this.$router.push('/login')
     },
-
-
     saveRegistration(){
       this.loading = true
-      this.$http.post("api/Login/saveri", this.RegisterInfo).then(
-        (res)=>{
-          this.loading = false
-          if (res.data.Type == "Error")
-          {
+      this.getPublicKey((publicKey)=>{
+        var encrypt = new JsEncrypt();
+        encrypt.setPublicKey(publicKey);
+
+        var user = {
+          UserNo:this.RegisterUser.UserNo,
+          Password:encrypt.encrypt(this.RegisterUser.ConfirmPassword),
+          Company:this.RegisterUser.Company,
+          MobilePhone:this.RegisterUser.MobilePhone
+        };
+        this.$http.post("api/Login/savereg", user,{rsa: true}).then((res)=>{
+            this.loading = false
+            if (res.data.Type == "Error"){
+              this.$message({
+                message: res.data.Result,
+                type: 'error'
+              })
+            } else {
+              this.$router.push('/login')
+            }
+          }).catch(error=> {
+            this.loading = false
             this.$message({
-              message: res.data.Result,
+              message: error.message,
               type: 'error'
             })
-          }
-          else {
-            this.$router.push('/login')
-          }
+          })
+      });
+    },
+    getPublicKey:function(callback){
+      this.$http.get('/api/login/getpublickey').then(res=>{
+        if(callback){
+          callback(res.data)
         }
-      ).catch(error=> {
-        this.loading = false
+      }).catch(error=>{
         this.$message({
-          message: error.message,
-          type: 'error'
+          message:err.message,
+          type:'error'
         })
       })
     }

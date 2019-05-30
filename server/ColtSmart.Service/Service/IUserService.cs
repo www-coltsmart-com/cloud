@@ -9,5 +9,11 @@ namespace ColtSmart.Service.Service
         IResult ModifyPassword(TUser user);
 
         TUser GetUser(string userno);
+
+        PagedResult<TUser> GetUsers(int page, int pageSize, string userName);
+
+        int DeleteUser(int id);
+
+        IResult RegisterUser(TUser user);
     }
 }

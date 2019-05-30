@@ -1,14 +1,15 @@
 ﻿using ColtSmart.Data;
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ColtSmart.Entity
 {
+    /// <summary>
+    /// 设备类
+    /// </summary>
     public class Device
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        public int id { get; set; }
+        public int Id { get; set; }
 
         public string DeviceId { get; set; }
 
@@ -18,16 +19,20 @@ namespace ColtSmart.Entity
 
         public string DeviceName { get; set; }
 
-        public bool IsOnline{get;set;}
+        public bool IsOnline { get; set; }
 
-		public DateTime InDate { get; set; }
+        public DateTime InDate { get; set; }
 
         public string UserOwn { get; set; }
 
         public string Gps { get; set; }
-
-        public int ComPortNum { get; set; }
-
+        /// <summary>
+        /// 设备版本
+        /// </summary>
         public string Version { get; set; }
+        /// <summary>
+        /// 串行端口号
+        /// </summary>
+        public int ComPortNum { get; set; }
     }
 }

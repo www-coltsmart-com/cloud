@@ -1,16 +1,14 @@
 ﻿using ColtSmart.Entity;
-using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace ColtSmart.Service
+namespace ColtSmart.Service.Service
 {
     public interface IDeviceService
     {
-        Task<Device> GetDevice(string deviceId);
+        PagedResult<Device> GetDevices(int page, int pageSize, string deviceName);
 
-        Task<Device> GetDevice(string deviceId, string userNo);
-
-        Task Update(Device device);
-
-        Task Insert(Device device);
+        int DeleteDevice(int id);
     }
 }

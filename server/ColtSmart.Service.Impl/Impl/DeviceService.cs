@@ -1,55 +1,42 @@
 ﻿using ColtSmart.Data;
 using ColtSmart.Entity;
+using ColtSmart.Service.Service;
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
-namespace ColtSmart.Service.Impl
+namespace ColtSmart.Service.Impl.Impl
 {
-    public class DeviceService: IDeviceService
+    public class DeviceService : IDeviceService
     {
-        private readonly ISqlExecutor sqlExecutor;
+        private readonly ISqlExecutor sqlExecutor = null;
 
-        public DeviceService(DbOptions dbOptions)
+        public DeviceService(ISqlExecutor sqlExecutor)
         {
-            this.sqlExecutor = new SqlExecutor(dbOptions);
+            this.sqlExecutor = sqlExecutor;
         }
 
-        public async Task<Device> GetDevice(string deviceId)
+        public PagedResult<Device> GetDevices(int page, int pageSize, string deviceName)
         {
-            var device = await this.sqlExecutor.FindAsync<Device>(new { DeviceId = deviceId });
-
-            return device.FirstOrDefault();
-        }
-
-        public async Task<Device> GetDevice(string deviceId, string userNo)
-        {
-            var device = await this.sqlExecutor.FindAsync<Device>(new { DeviceId = deviceId, UserOwn = userNo });
-
-            return device.FirstOrDefault();
-        }
-
-        public async Task Insert(Device device)
-        {
-            await this.sqlExecutor.InsertAsync<Device>(device);
-        }
-
-        public async Task Update(Device device)
-        {
-            await this.sqlExecutor.ExecuteAsync("upddate device set \"DeviceType\"=@DeviceType, \"IsGetway\" =@IsGetway, \"DeviceName\" =@DeviceName, \"IsOnline\" =@IsOnline, \"InDate\" =@InDate, \"UserOwn\" =@UserOwn, \"Gps\" =@Gps, \"Version\" =@Version, \"ComPortNum\" =@ComPortNum where DeviceId=@DeviceId", new
+            StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM device");
+            object param = null;
+            if (!string.IsNullOrEmpty(deviceName))
             {
-                #region
-                DeviceId = device.DeviceId,
-                DeviceType=device.DeviceType,
-                IsGetway=device.IsGetway,
-                DeviceName=device.DeviceName,
-                IsOnline=device.IsOnline,
-                InDate=device.InDate,
-                UserOwn=device.UserOwn,
-                Gps=device.Gps,
-                Version=device.Version,
-                ComPortNum=device.ComPortNum
-                #endregion
-            }, commandType: System.Data.CommandType.Text);
+                sqlBuilder.Append(" WHERE \"DeviceName\" like @DeviceName");
+                param = new { DeviceName = string.Format("{0}%", deviceName.Trim()) };
+            }
+            return sqlExecutor.QueryPage<Device>(sqlBuilder.ToString(), page, pageSize, param).ToPagedResult();
+        }
+
+        public int DeleteDevice(int id)
+        {
+            Device device = sqlExecutor.Find<Device>(new { Id = id }).FirstOrDefault();
+            if (device != null)
+            {
+                return sqlExecutor.Delete<Device>(device);
+            }
+            return 0;
         }
     }
 }

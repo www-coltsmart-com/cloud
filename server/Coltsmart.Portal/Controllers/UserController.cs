@@ -5,32 +5,31 @@ using System.Collections.Generic;
 using System.Web.Http;
 using System.Linq;
 using System;
+using ColtSmart.Service.Service;
 
 namespace Coltsmart.Portal.Controllers
 {
     public class UserController : ApiController
     {
+        private IUserService userService = null;
+
+        public UserController(IUserService userService)
+        {
+            this.userService = userService;
+        }
+
         [HttpGet]
         [Route("api/users")]
         public PagedResult<TUser> Get(int page, int size, string username)
         {
-            var pr = new PagedResult<TUser>
-            {
-                CurrentPage = page,
-                PageSize = size,
-                TotalCount = Users.Count
-            };
-
-            pr.Result = Users.Skip((page - 1) * size).Take(size);
-
-            return pr;
+            return userService.GetUsers(page, size, username);
         }
 
         [HttpDelete]
         [Route("api/users/{id}")]
         public int Delete(int id)
         {
-            return 0;
+            return userService.DeleteUser(id);
         }
 
         [HttpPost]
