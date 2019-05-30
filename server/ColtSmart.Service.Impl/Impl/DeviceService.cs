@@ -1,6 +1,7 @@
 ﻿using ColtSmart.Data;
 using ColtSmart.Entity;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ColtSmart.Service.Impl
@@ -28,6 +29,19 @@ namespace ColtSmart.Service.Impl
             return device.FirstOrDefault();
         }
 
+        public async Task<PagedResult<Device>> GetDevices(int page, int pageSize, string deviceName)
+        {
+            StringBuilder sqlBuilder = new StringBuilder("SELECT * FROM device");
+            object param = null;
+            if (!string.IsNullOrEmpty(deviceName))
+            {
+                sqlBuilder.Append(" WHERE \"DeviceName\" like @DeviceName");
+                param = new { DeviceName = string.Format("{0}%", deviceName.Trim()) };
+            }
+            var results = await sqlExecutor.QueryPageAsync<Device>(sqlBuilder.ToString(), page, pageSize, param);
+            return results.ToPagedResult();
+        }
+
         public async Task Insert(Device device)
         {
             await this.sqlExecutor.InsertAsync<Device>(device);
@@ -50,6 +64,16 @@ namespace ColtSmart.Service.Impl
                 ComPortNum=device.ComPortNum
                 #endregion
             }, commandType: System.Data.CommandType.Text);
+        }
+
+        public async Task Delete(int id)
+        {
+            var results = await this.sqlExecutor.FindAsync<Device>(new { Id = id });
+            var device = results.FirstOrDefault();
+            if (device != null)
+            {
+                await this.sqlExecutor.DeleteAsync(device);
+            }
         }
     }
 }

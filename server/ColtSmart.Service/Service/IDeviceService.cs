@@ -9,6 +9,10 @@ namespace ColtSmart.Service
 
         Task<Device> GetDevice(string deviceId, string userNo);
 
+        Task<PagedResult<Device>> GetDevices(int page, int pageSize, string deviceName);
+
+        Task Delete(int id);
+
         Task Update(Device device);
 
         Task Insert(Device device);
