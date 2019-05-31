@@ -1,4 +1,5 @@
 ﻿using ColtSmart.Entity.Entities;
+using System.Threading.Tasks;
 
 namespace ColtSmart.Service.Service
 {
@@ -10,10 +11,10 @@ namespace ColtSmart.Service.Service
 
         TUser GetUser(string userno);
 
-        PagedResult<TUser> GetUsers(int page, int pageSize, string userName);
+        Task<PagedResult<TUser>> GetUsers(int page, int pageSize, string userName);
 
-        int DeleteUser(int id);
+        Task<int> Delete(int id);
 
-        IResult RegisterUser(TUser user);
+        Task<IResult> Register(TUser user);
     }
 }

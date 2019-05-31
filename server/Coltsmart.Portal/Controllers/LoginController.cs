@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace coltsmart.server.Controllers
@@ -113,7 +114,7 @@ namespace coltsmart.server.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("api/Login/savereg")]
-        public ActionResult Register([FromBody]TUser user)
+        public async Task<ActionResult> Register([FromBody]TUser user)
         {
             Dictionary<string, string> keyPair = null;
             if (cache.Get("RSAKEYPAIR") == null)
@@ -127,7 +128,8 @@ namespace coltsmart.server.Controllers
             }
             //Ω‚√‹µ«¬º√‹¬Î
             user.Password = EncryptionProvider.DecryptRSA(user.Password, keyPair["PRIVATE"]);
-            return Json(userService.RegisterUser(user));
+            var result = await userService.Register(user);
+            return Json(result);
         }
     }
 }

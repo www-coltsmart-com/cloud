@@ -6,6 +6,7 @@ using System.Web.Http;
 using System.Linq;
 using System;
 using ColtSmart.Service.Service;
+using System.Threading.Tasks;
 
 namespace Coltsmart.Portal.Controllers
 {
@@ -20,16 +21,16 @@ namespace Coltsmart.Portal.Controllers
 
         [HttpGet]
         [Route("api/users")]
-        public PagedResult<TUser> Get(int page, int size, string username)
+        public async Task<PagedResult<TUser>> Get(int page, int size, string username)
         {
-            return userService.GetUsers(page, size, username);
+            return await userService.GetUsers(page, size, username);
         }
 
         [HttpDelete]
         [Route("api/users/{id}")]
-        public int Delete(int id)
+        public async Task<int> Delete(int id)
         {
-            return userService.DeleteUser(id);
+            return await userService.Delete(id);
         }
 
         [HttpPost]
@@ -40,283 +41,6 @@ namespace Coltsmart.Portal.Controllers
 
             return null;
         }
-
-        public static List<TUser> Users = new List<TUser>
-        {
-            new TUser
-            {
-                Id=100,
-                DevCount =200,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@163.com",
-                UserName ="刘小东",
-                UserNo="liuxiaodong"
-            },
-            new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },
-            new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            },new TUser
-            {
-                Id=101,
-                DevCount =201,
-                MobilePhone ="15865289221",
-                RegDate =System.DateTime.Now,
-                RegEmall ="328740754@qq.com",
-                UserName ="马威",
-                UserNo="mawei"
-            }
-        };
 
         public string EncryptHelper { get; private set; }
     }
