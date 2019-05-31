@@ -15,6 +15,8 @@ namespace ColtSmart.Service.Service
 
         Task<int> Delete(int id);
 
+        Task<IResult> Create(TUser user);
+
         Task<IResult> Register(TUser user);
     }
 }

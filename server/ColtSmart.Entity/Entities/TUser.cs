@@ -5,6 +5,7 @@ namespace ColtSmart.Entity.Entities
 {
     public class TUser
     {
+        [IgnoreInsert]
         [Key]
         public int Id { get; set; }
 

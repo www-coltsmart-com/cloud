@@ -78,6 +78,26 @@ namespace ColtSmart.Service.Impl
             return 0;
         }
 
+        public async Task<IResult> Create(TUser user)
+        {
+            if (user == null || string.IsNullOrEmpty(user.UserNo))
+            {
+                return new ErrorResult<string>("用户信息无效");
+            }
+            var results = await sqlExecutor.FindAsync<TUser>(new { UserNo = user.UserNo });
+            var retUser = results.FirstOrDefault();
+            if (retUser != null)
+            {
+                return new ErrorResult<string>("用户名已存在，请重新输入一个新的用户名");
+            }
+            user.UserNo = user.UserNo.Trim();
+            user.UserType = EUserType.Admin;//后台手工添加用户为管理员，通过注册用户则为普通用户
+            user.Password = ColtSmart.Encrypt.EncryptHelper.Instance.PassEncryption(user.UserNo, "654321");
+            user.RegDate = DateTime.Now;
+            int result = await sqlExecutor.InsertAsync<TUser>(user);
+            return new BaseResult<int>(result);
+        }
+
         public async Task<IResult> Register(TUser user)
         {
             if (user == null || string.IsNullOrEmpty(user.UserNo) || string.IsNullOrEmpty(user.Password))

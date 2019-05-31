@@ -34,12 +34,10 @@ namespace Coltsmart.Portal.Controllers
         }
 
         [HttpPost]
-        public IResult Post([FromBody]TUser value)
+        [Route("api/users")]
+        public async Task<IResult> Create([FromBody]TUser user)
         {
-            value.RegDate = DateTime.Now;
-            value.Password = ColtSmart.Encrypt.EncryptHelper.Instance.PassEncryption(value.UserNo, "654321");
-
-            return null;
+            return await userService.Create(user);
         }
 
         public string EncryptHelper { get; private set; }
