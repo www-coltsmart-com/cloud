@@ -115,6 +115,7 @@ export default {
 				params:{
 					page: this.page.index,
 					size: this.page.size,
+					userNo:localStorage.UserName,
 					deviceId:this.filter.DeviceId,
 					deviceName: this.filter.DeviceName
 				}

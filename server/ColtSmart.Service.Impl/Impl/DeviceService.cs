@@ -1,5 +1,6 @@
 ﻿using ColtSmart.Data;
 using ColtSmart.Entity;
+using ColtSmart.Entity.Entities;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,8 +38,32 @@ namespace ColtSmart.Service.Impl
         /// <returns>设备列表</returns>
         public async Task<PagedResult<Device>> GetDevices(int page, int pageSize, string userNo, string deviceId, string deviceName)
         {
+            //如果无法辨别当前用户，则默认返回空列表，防止信息泄露
+            if (string.IsNullOrEmpty(userNo))
+            {
+                return new PagedResult<Device>()
+                {
+                    Result = null,
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalCount = 0
+                };
+            }            
+            var users = await this.sqlExecutor.FindAsync<TUser>(new { UserNo = userNo });
+            var user = users.FirstOrDefault();
+            if (user == null)
+            {
+                return new PagedResult<Device>()
+                {
+                    Result = null,
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalCount = 0
+                };
+            }
+            //拼接SQL字符串
             StringBuilder sqlBuilder = new StringBuilder();
-            if (!string.IsNullOrEmpty(userNo))
+            if (user.UserType != EUserType.Admin)//如果不是管理员，则只看到当前用户名下的设备清单
             {
                 if (sqlBuilder.Length > 0) sqlBuilder.Append(" AND ");
                 sqlBuilder.Append("\"UserOwn\" = @UserOwn");
@@ -55,7 +80,7 @@ namespace ColtSmart.Service.Impl
             }
             object param = new
             {
-                UserOwn = string.IsNullOrEmpty(userNo) ? "" : userNo.Trim(),
+                UserOwn = user.UserNo,
                 DeviceId = string.IsNullOrEmpty(deviceId) ? "%" : string.Format("{0}%", deviceId.Trim()),
                 DeviceName = string.IsNullOrEmpty(deviceName) ? "%" : string.Format("{0}%", deviceName.Trim())
             };
@@ -100,7 +125,7 @@ namespace ColtSmart.Service.Impl
             var device = results.FirstOrDefault();
             if (device != null)
             {
-               return await this.sqlExecutor.DeleteAsync(device);
+                return await this.sqlExecutor.DeleteAsync(device);
             }
             return 0;
         }
