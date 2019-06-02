@@ -12,12 +12,10 @@ namespace Coltsmart.Portal.Controllers
     public class DeviceController : ApiController
     {
         private IDeviceService deviceService = null;
-        private IUserService userService = null;
 
-        public DeviceController(IDeviceService deviceService,IUserService userService)
+        public DeviceController(IDeviceService deviceService)
         {
             this.deviceService = deviceService;
-            this.userService = userService;
         }
         /// <summary>
         /// 获取设备列表
