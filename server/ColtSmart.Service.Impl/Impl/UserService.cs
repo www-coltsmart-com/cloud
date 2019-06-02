@@ -18,19 +18,21 @@ namespace ColtSmart.Service.Impl
             this.sqlExecutor = new SqlExecutor(dbOptions);
         }
 
-        public IResult ModifyPassword(TUser user)
+        public async Task<IResult> ModifyPassword(TUser user)
         {
-            var retUser = sqlExecutor.Find<TUser>(new { UserName = user.UserName }).FirstOrDefault();
-
+            if (user == null || string.IsNullOrEmpty(user.UserNo) || string.IsNullOrEmpty(user.Password) || string.IsNullOrEmpty(user.NewPassword))
+            {
+                return new ErrorResult<string>("用户名或密码不能为空");
+            }
+            var users = await sqlExecutor.FindAsync<TUser>(new { UserNo = user.UserNo });
+            var retUser = users.FirstOrDefault();
             if (retUser == null)
                 return new ErrorResult<string>("该用户不存在");
-
-            if (retUser.Password != user.Password)
-                return new ErrorResult<string>("原密码错误，修改失败！");
-
-            retUser.Password = user.NewPassword;
-            var result = sqlExecutor.Update<TUser>(retUser);
-
+            string password = EncryptHelper.Instance.PassEncryption(user.UserNo, user.Password.Trim());
+            if (retUser.Password != password)
+                return new ErrorResult<string>("原密码不正确！");
+            retUser.Password = retUser.NewPassword = EncryptHelper.Instance.PassEncryption(user.UserNo, user.NewPassword);
+            var result = await sqlExecutor.UpdateAsync<TUser>(retUser);
             return new BaseResult<int>(result);
         }
 

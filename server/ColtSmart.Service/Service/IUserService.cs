@@ -7,7 +7,7 @@ namespace ColtSmart.Service.Service
     {
         bool VerifyUser(string username, string password);
 
-        IResult ModifyPassword(TUser user);
+        Task<IResult> ModifyPassword(TUser user);
 
         TUser GetUser(string userno);
 
