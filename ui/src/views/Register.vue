@@ -139,7 +139,11 @@ export default {
                 type: 'error'
               })
             } else {
-              this.$router.push('/login')
+              this.$message({
+                message: '恭喜您注册成功，即将跳转到登录页!',
+                type: 'success'
+              });    
+              this.$router.push('/login');   
             }
           }).catch(error=> {
             this.loading = false

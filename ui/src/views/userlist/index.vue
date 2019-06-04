@@ -3,7 +3,7 @@
         <el-col :span="24" class="toolbar">
 			<el-form :inline="true" :model="filter">
 				<el-form-item>
-					<el-input v-model="filter.UserNo" placeholder="用户名称"></el-input>
+					<el-input v-model="filter.UserName" placeholder="用户名称"></el-input>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" icon="el-icon-search" v-on:click="queryUsers" :loading="table.loading">查询</el-button>
@@ -46,8 +46,8 @@
 		<!--新增界面-->
 		<el-dialog title="新增用户" :visible.sync="add.visible" :close-on-click-modal="false">
 			<el-form :model="add.data" label-width="100px" :rules="add.rules" ref="addForm">
-				<el-form-item label="用户编码：" prop="UserCode">
-					<el-input v-model="add.data.UserCode" auto-complete="off"></el-input>
+				<el-form-item label="用户编码：" prop="UserNo">
+					<el-input v-model="add.data.UserNo" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="用户名称：" prop="UserName">
 					<el-input v-model="add.data.UserName" auto-complete="off"></el-input>
@@ -68,8 +68,7 @@
 </template>
 <script>
 export default {
-	name: 'UserList',
-	
+	name: 'UserList',	
     data: function () {
 		let checkEMail=(rule, value, callback) => {
 			if (!value) {
@@ -88,7 +87,7 @@ export default {
 		};
         return {
             filter: {
-				UserNo: ''
+				UserName: ''
 			},
 			page: {
 				index: 1,
@@ -102,14 +101,13 @@ export default {
 			},
 			add: {
 				visible: false,
-				loading: false,
-				
+				loading: false,				
 				rules: {			
-					UserCode: [
+					UserNo: [
 						{ required: true, message: '请输入用户编码！', trigger: 'blur' }
 					],			
 					UserName: [
-						{ required: true, message: '请输入用户编码！',trigger: 'blur' }
+						{ required: true, message: '请输入用户名称！',trigger: 'blur' }
 					],				
 					RegEmall: [
 						{ required: false,  trigger: 'blur' }
@@ -120,7 +118,7 @@ export default {
 				},
 				data:  {
 					Id: 0,
-					UserCode: '',
+					UserNo: '',
 					UserName: '',
 					RegEmall: '',
 					MobilePhone: ''
@@ -137,7 +135,7 @@ export default {
 		   	this.add.visible = true;
 			this.add.data = {
 				Id: 0,
-				UserCode: '',
+				UserNo: '',
 				UserName: '',
 				RegEmall: '',
 				MobilePhone: ''
@@ -146,11 +144,8 @@ export default {
        handleDel: function (row) {
 			this.$confirm('确认删除该记录吗？', '提示', { type: 'warning' })
 				.then(() => {
-					this.table.loading = true
-                    
-					this.$http.delete('/api/users/'+row.Id, {
-						//params: { id: row.Id }
-					}).then((res) => {
+					this.table.loading = true                    
+					this.$http.delete('/api/users/'+row.Id).then((res) => {
 						this.table.loading = false
 						this.$message('删除成功')
 						this.getUsers()
@@ -176,7 +171,7 @@ export default {
 				params:{
 					page: this.page.index,
                     size: this.page.size,
-					username: this.filter.UserNo
+					userName: this.filter.UserName
 				}
 				}).then(res=>{
 					this.table.loading = false
@@ -194,22 +189,18 @@ export default {
 			this.$refs['addForm'].validate((valid) => {
 				if (valid) {
 					this.$confirm('确认提交吗？', '提示', {}).then(() => {
-						this.add.loading = true
-						
+						this.add.loading = true						
 						this.$http.post('/api/users/', this.add.data)
 							.then((res) => {
 								this.add.loading = false
-
 								if (res.data.Type == "Error") {
 									this.$message({message: res.data.Result,type: 'error',duration: 0,showClose: true})
-								}
-								else {
+								} else {
 									this.$message({message: '提交成功',type: 'success'})						
 									this.$refs['addForm'].resetFields();
 									this.add.visible = false;
-									this.getPages();
+									this.getUsers();
 								}
-
 							}).catch((error) => {
 								this.add.loading = false
 								this.$message({message: error.message,type: 'error',duration: 0,showClose: true})

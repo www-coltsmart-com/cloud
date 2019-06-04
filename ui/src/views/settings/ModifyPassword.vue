@@ -3,8 +3,8 @@
     <el-tab-pane label="修改密码" name="first">
       
     <el-form :model="user" label-width="80px" style="width:400px;" :rules="rules" ref="editForm">
-        <el-form-item label="用户民" prop="UserName">
-            <el-input v-model="user.UserName" auto-complete="off" disabled></el-input>
+        <el-form-item label="用户名" prop="UserNo">
+            <el-input v-model="user.UserNo" auto-complete="off" disabled></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="Password">
             <el-input :type="PassEye" v-model="user.Password" auto-complete="off">
@@ -30,7 +30,7 @@ export default {
         return {
             loading: false,
             user: {
-                UserName: '',
+                UserNo: '',
                 Password: '',
                 NewPassword: ''
             },
@@ -51,9 +51,17 @@ export default {
             this.$refs['editForm'].validate((valid) => {
 				if (valid) {
 					this.$confirm('确认提交吗？', '提示', {}).then(() => {
-						this.loading = true
-						this.$http.post('/api/login/modifypassword', this.user)
-							.then((res) => {
+                        this.loading = true
+                         this.getPublicKey((publickey) => {
+                            var encrypt = new JSEncrypt();
+                            encrypt.setPublicKey(publickey);
+
+                            var data = {
+                                UserNo: this.user.UserNo,
+                                Password: encrypt.encrypt(this.user.Password),
+                                NewPassword: encrypt.encrypt(this.user.NewPassword)
+                            };
+                            this.$http.post('/api/login/modifypassword', data).then((res) => {
                                 this.loading = false
                                 if (res.data.Type == 'Error') {
                                     this.$message({
@@ -69,7 +77,6 @@ export default {
                                         type: 'success'
                                     })
                                 }
-
 							}).catch((error) => {
 								this.loading = false
 								this.$message({
@@ -78,14 +85,26 @@ export default {
                                     duration: 0,
                                     showClose: true
                                 })
-							})
+							});
+                        });						
 					})
 				}
 			})
+        },
+        getPublicKey: function (callback) {
+            this.$http.get('/api/login/getpublickey').then(res => {
+                if(callback)
+                    callback(res.data)
+            }).catch(error => {  
+                this.$message({
+                    message: error.message,
+                    type: 'error'
+                    })       
+            })
         }
     },
     mounted: function () {
-        this.user.UserName = localStorage.UserName
+        this.user.UserNo = localStorage.UserName
     }
 }
 </script>
