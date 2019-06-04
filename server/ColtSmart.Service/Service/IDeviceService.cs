@@ -16,5 +16,7 @@ namespace ColtSmart.Service
         Task Update(Device device);
 
         Task Insert(Device device);
+
+        Task UpdateOnline(string deviceId, bool isOnline);
     }
 }

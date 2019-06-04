@@ -1,5 +1,6 @@
 ﻿using ColtSmart.Data;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ColtSmart.Entity
 {
@@ -9,7 +10,8 @@ namespace ColtSmart.Entity
     public class Device
     {
         [Key]
-        public int Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int id { get; set; }
 
         public string DeviceId { get; set; }
 

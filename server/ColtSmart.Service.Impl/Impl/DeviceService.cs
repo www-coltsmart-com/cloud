@@ -49,7 +49,7 @@ namespace ColtSmart.Service.Impl
 
         public async Task Update(Device device)
         {
-            await this.sqlExecutor.ExecuteAsync("upddate device set \"DeviceType\"=@DeviceType, \"IsGetway\" =@IsGetway, \"DeviceName\" =@DeviceName, \"IsOnline\" =@IsOnline, \"InDate\" =@InDate, \"UserOwn\" =@UserOwn, \"Gps\" =@Gps, \"Version\" =@Version, \"ComPortNum\" =@ComPortNum where DeviceId=@DeviceId", new
+            await this.sqlExecutor.ExecuteAsync("update device set \"DeviceType\"=@DeviceType, \"IsGetway\" =@IsGetway, \"DeviceName\" =@DeviceName, \"IsOnline\" =@IsOnline, \"InDate\" =@InDate, \"UserOwn\" =@UserOwn, \"Gps\" =@Gps, \"Version\" =@Version, \"ComPortNum\" =@ComPortNum where \"DeviceId\"=@DeviceId", new
             {
                 #region
                 DeviceId = device.DeviceId,
@@ -74,6 +74,15 @@ namespace ColtSmart.Service.Impl
             {
                 await this.sqlExecutor.DeleteAsync(device);
             }
+        }
+
+        public async Task UpdateOnline(string deviceId, bool isOnline)
+        {
+            await this.sqlExecutor.ExecuteAsync("update device set \"IsOnline\" =@IsOnline where \"DeviceId\"=@DeviceId", new
+            {
+                DeviceId=deviceId,
+                IsOnline=isOnline
+            }, System.Data.CommandType.Text);
         }
     }
 }
