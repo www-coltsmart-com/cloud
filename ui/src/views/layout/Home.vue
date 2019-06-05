@@ -110,6 +110,18 @@ export default {
           this.user.id=res.data.Id;
           this.user.isAdmin=res.data.IsAdmin;
 
+          //如果是默认密码，则强制修改
+          if(res.data.IsDefaultPassword){
+            this.$confirm('您的密码不安全，请修改密码后重新登录！', '提示', {
+              confirmButtonText: '现在去修改',
+              cancelButtonText: '退出登录',
+              type: 'warning'
+            }).then(() => {
+              this.$router.push('/password')
+            }).catch(() => {
+              this.$router.push('/Login')         
+            });
+          }
           if(this.user.isAdmin){
             this.info.totaldevice="总设备数："+res.data.TotalDevice;
             this.info.totaluser="总用户数："+res.data.TotalUser;
