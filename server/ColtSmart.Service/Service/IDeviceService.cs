@@ -29,5 +29,7 @@ namespace ColtSmart.Service
         /// <param name="id">设备唯一标识</param>
         /// <returns>影响行数</returns>
         Task<int> Delete(int id);
+
+        Task UpdateOnline(string deviceId, bool isOnline);
     }
 }
