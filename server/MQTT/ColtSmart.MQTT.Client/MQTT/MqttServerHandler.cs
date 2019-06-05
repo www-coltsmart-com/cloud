@@ -5,7 +5,6 @@ using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Receiving;
 using MQTTnet.Extensions.ManagedClient;
-using MQTTnet.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,9 +33,7 @@ namespace ColtSmart.MQTT.Client
         public async Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
         {
             var recvMsg = Encoding.UTF8.GetString(eventArgs.ApplicationMessage.Payload);
-            Console.WriteLine("收到来自客户端" +eventArgs.ClientId + "，主题为" + eventArgs.ApplicationMessage.Topic + "的消息：" + recvMsg);
-
-            eventArgs.ProcessingFailed=await this.ProcessReceiveMessage(eventArgs.ApplicationMessage.Topic, eventArgs.ClientId, recvMsg);
+            eventArgs.ProcessingFailed=await this.ProcessReceiveMessage(eventArgs.ApplicationMessage.Topic, recvMsg);
         }
 
 
@@ -47,7 +44,7 @@ namespace ColtSmart.MQTT.Client
         /// <param name="clientId">设备Id</param>
         /// <param name="reciveMsg">接收消息</param>
         /// <returns></returns>
-        private async Task<bool> ProcessReceiveMessage(string topic,string clientId,string reciveMsg)
+        private async Task<bool> ProcessReceiveMessage(string topic,string reciveMsg)
         {
             var processingFailed = true;
 
@@ -62,11 +59,15 @@ namespace ColtSmart.MQTT.Client
 
                         if (!string.IsNullOrWhiteSpace(tInFo.Item2))
                         {
-                          await this.ProcessDeviceSetup(clientId, tInFo.Item2, dSetup);
+                          await this.ProcessDeviceSetup(dSetup.DeviceId, tInFo.Item2, dSetup);
                             processingFailed = false;
                         }
                         break;
                     case "data":
+                        break;
+                    case "offline":
+                        var deviceId = JsonHelper.DeserializeObject<string>(reciveMsg);
+                        await this.deviceService.UpdateOnline(deviceId,false);
                         break;
                 }
 
@@ -93,6 +94,9 @@ namespace ColtSmart.MQTT.Client
             }else if (topic.EndsWith("/data"))
             {
                 pType = "data";
+            }else if (topic.EndsWith("/offline"))
+            {
+                pType = "offline";
             }
 
             var tSpilt= topic.Split('/').ToList();
@@ -131,6 +135,7 @@ namespace ColtSmart.MQTT.Client
             }
             else
             {
+                device.IsOnline = true;
                 await this.deviceService.Update(device);
             }
         }
@@ -140,7 +145,7 @@ namespace ColtSmart.MQTT.Client
 
         public Task HandleDisconnectedAsync(MqttClientDisconnectedEventArgs eventArgs)
         {
-            Console.WriteLine("MQTT断开连接" + eventArgs.Exception==null?"":(eventArgs.Exception.Message+"；"+eventArgs.Exception.StackTrace));
+            Console.WriteLine("MQTT断开连接");
             return Task.CompletedTask;
         }
 

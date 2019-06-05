@@ -1,6 +1,6 @@
 ﻿namespace ColtSmart.MQTT.Client.Entities
 {
-    public class DeviceSetup
+    public class DeviceSetup: MessageBase
     {
         public bool IsGateway { get; set; }
 
@@ -11,5 +11,10 @@
         public int ComPortNum { get; set; }
 
         public string GPS { get; set; }
+    }
+
+    public class MessageBase
+    {
+        public string DeviceId { get; set; }
     }
 }

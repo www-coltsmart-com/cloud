@@ -1,14 +1,14 @@
 ﻿using ColtSmart.MQTT.Client.Options;
+using ColtSmart.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MQTTnet;
+using MQTTnet.Client;
 using MQTTnet.Client.Options;
+using MQTTnet.Diagnostics;
 using MQTTnet.Extensions.ManagedClient;
 using System;
-using System.Collections.Generic;
-using MQTTnet.AspNetCore;
-using ColtSmart.Service;
 using System.Threading.Tasks;
 
 namespace ColtSmart.MQTT.Client
@@ -18,9 +18,9 @@ namespace ColtSmart.MQTT.Client
         public static IServiceCollection AddColtSmartMQTT(this IServiceCollection services, IConfiguration configuration)
         {
             var mqttOption = configuration.GetSection("MqttOption").Get<MqttOption>();
-            var mqttClient = new MqttFactory().CreateManagedMqttClient();
+            var mqttClient = new MqttFactory().CreateMqttClient();
 
-            services.AddSingleton<IManagedMqttClient>(mqttClient);
+            services.AddSingleton<IMqttClient>(mqttClient);
             services.AddSingleton<MqttOption>(mqttOption);
 
             return services;
@@ -36,26 +36,35 @@ namespace ColtSmart.MQTT.Client
         {
             try
             {
-                var mqttClient = EnjoyGlobals.ServiceProvider.GetService<IManagedMqttClient>();
+                var mqttClient = EnjoyGlobals.ServiceProvider.GetService<IMqttClient>();
                 var deviceService = EnjoyGlobals.ServiceProvider.GetService<IDeviceService>();
+                var mqttOption = EnjoyGlobals.ServiceProvider.GetService<MqttOption>();
 
-                var options = new ManagedMqttClientOptionsBuilder().WithAutoReconnectDelay(TimeSpan.FromMinutes(1))
-                                                                   .WithClientOptions(new MqttClientOptionsBuilder().WithClientId("coltsmart_cloud_admin")
-                                                                                                                    .WithTcpServer("101.132.97.241", 1883)
-                                                                                                                    .Build())
-                                                                   .Build();
+                var options = new MqttClientOptionsBuilder().WithCommunicationTimeout(TimeSpan.FromMinutes(1))
+                                                          .WithClientId("coltsmart_cloud_admin")
+                                                          .WithTcpServer(mqttOption.HostIp, mqttOption.HostPort)
+                                                          .WithCleanSession(true)
+                                                          .Build();
 
-                await mqttClient.StartAsync(options);
-                await mqttClient.SubscribeAsync(new List<TopicFilter>
+                MqttNetGlobalLogger.LogMessagePublished += (s, e) =>
                 {
-                    new TopicFilter{ Topic="device/*/com/*/info"},
-                    new TopicFilter{ Topic="device/*/com/*/data"},
-                });
+                    var trace = $">> [{e.TraceMessage.Timestamp:O}] [{e.TraceMessage.ThreadId}] [{e.TraceMessage.Source}] [{e.TraceMessage.Level}]: {e.TraceMessage.Message}";
+
+                    if (e.TraceMessage.Exception != null)
+                    {
+                        trace += Environment.NewLine + e.TraceMessage.Exception.ToString();
+                    }
+
+                    Console.WriteLine(trace);
+                };
+
+                await mqttClient.ConnectAsync(options);
+                await mqttClient.SubscribeAsync("device/#");
 
                 var mqttHandler= new MqttServerHandler(deviceService);
                 mqttClient.ApplicationMessageReceivedHandler= mqttHandler;
                 mqttClient.DisconnectedHandler = mqttHandler;
-                mqttClient.ConnectingFailedHandler = mqttHandler;
+                
                 mqttClient.ConnectedHandler = mqttHandler;
             }
             catch (Exception ex)
