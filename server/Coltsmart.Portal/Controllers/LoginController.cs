@@ -1,5 +1,6 @@
 using ColtSmart.Core.Encrypt;
 using ColtSmart.Data;
+using ColtSmart.Encrypt;
 using ColtSmart.Entity.Entities;
 using ColtSmart.JWT;
 using ColtSmart.Service;
@@ -49,7 +50,6 @@ namespace coltsmart.server.Controllers
         public dynamic UserInfo(string userName)
         {
             var user = userService.GetUser(userName);
-
             if (user != null)
             {
                 return new
@@ -62,7 +62,8 @@ namespace coltsmart.server.Controllers
                     EMail = user.RegEmall,
                     MobilePhone = user.MobilePhone,
                     Company = user.Company,
-                    RegDate = user.RegDate
+                    RegDate = user.RegDate,
+                    IsDefaultPassword = user.Password.Equals(EncryptHelper.Instance.PassEncryption(user.UserNo, "654321"))
                 };
             }
             else
@@ -77,7 +78,8 @@ namespace coltsmart.server.Controllers
                     EMail = "",
                     MobilePhone = "",
                     Company = "",
-                    RegDate = ""
+                    RegDate = "",
+                    IsDefaultPassword = false
                 };
             }
         }
@@ -91,7 +93,7 @@ namespace coltsmart.server.Controllers
             return keyPair["PEMPUBLIC"];
         }
 
-        private Dictionary<string,string> GetRSAKeyPair()
+        private Dictionary<string, string> GetRSAKeyPair()
         {
             Dictionary<string, string> keyPair = null;
             if (cache.Get("RSAKEYPAIR") == null)
