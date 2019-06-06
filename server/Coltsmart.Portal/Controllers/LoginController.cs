@@ -10,8 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
+using System.Net.Mail;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Text;
 
 namespace coltsmart.server.Controllers
 {
@@ -113,11 +116,81 @@ namespace coltsmart.server.Controllers
         [Route("api/Login/savereg")]
         public async Task<ActionResult> Register([FromBody]TUser user)
         {
+            //TODO:增加注册逻辑，判断验证码
+
+
             Dictionary<string, string> keyPair = GetRSAKeyPair();
             //解密登录密码
             user.Password = EncryptionProvider.DecryptRSA(user.Password, keyPair["PRIVATE"]);
             var result = await userService.Register(user);
             return Json(result);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("/api/login/sendverifycode")]
+        public IResult SendVerifyCode(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return new ErrorResult<string>("邮箱不能为空");
+            }
+            if(!System.Text.RegularExpressions.Regex.IsMatch(email, @"^\w+@\w+\.\w+$"))
+            {
+                return new ErrorResult<string>("邮箱格式不正确");
+            }
+
+            //生成6为随机验证码
+            string verifyCode = CreateVerifyCode(6);
+
+            //TODO:维护发送验证码的邮箱信息
+            string defaultEmail = "jim-lung@163.com";
+            string authCode = "1qaz2wsx";
+            string defaultHost = "smtp.163.com";
+            int defaultPort = 25;
+            string defaultSubject = "【鸣驹智能】邮箱注册验证码";
+            string defaultBody = "欢迎您注册鸣驹智能，您的注册码为{code}";
+
+            MailMessage message = new MailMessage(defaultEmail, email);
+            message.Subject = defaultSubject;
+            message.SubjectEncoding = Encoding.UTF8;
+            message.Body = defaultBody.Replace("{code}", verifyCode);
+
+            //发送邮件
+            SmtpClient client = new SmtpClient(defaultHost,defaultPort);           
+            client.EnableSsl = true;
+            client.UseDefaultCredentials = false;
+            client.Credentials = new NetworkCredential(defaultEmail, authCode);
+            client.Send(message);
+
+            //缓存验证码到内存中，以备注册时进行校验
+            cache.Set<string>(email, verifyCode);
+            return new BaseResult<string>("发送成功，请注意查收");
+        }
+
+        //生成6位数字和大写字母的验证码
+        private string CreateVerifyCode(int length)
+        {
+            int rep = 0;
+            string str = string.Empty;
+            long num2 = DateTime.Now.Ticks + rep;
+            rep++;
+            Random random = new Random(((int)(((ulong)num2) & 0xffffffffL)) | ((int)(num2 >> rep)));
+            for (int i = 0; i < length; i++)
+            {
+                char ch;
+                int num = random.Next();
+                if ((num % 2) == 0)
+                {
+                    ch = (char)(0x30 + ((ushort)(num % 10)));
+                }
+                else
+                {
+                    ch = (char)(0x41 + ((ushort)(num % 0x1a)));
+                }
+                str = str + ch.ToString();
+            }
+            return str;
         }
 
         [HttpPost]

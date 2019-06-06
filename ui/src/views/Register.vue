@@ -8,31 +8,32 @@
 
 <el-row class="login-center" type="flex" :style="'background: url(' + require('../assets/bg.png') + ') no-repeat scroll center center / cover;' " justify="center">
       <el-col :xs="12" :sm="10" :md="8" :lg="8" :xl="6">
-        <div style="height:80px;" class="hidden-lg-and-down"></div>
-        <div style="height:80px;" ></div>
+        <div style="height:50px;" class="hidden-lg-and-down"></div>
+        <div style="height:50px;" ></div>
         <el-card class="login-box" >
             <el-form :model="RegisterUser" ref="RegisterUser" :rules="RegisterRules" status-icon label-width="0px"> 
             <h1 class="title">立即注册</h1>
-              <p class="login-box-msg"></p>
-              
+            <p class="login-box-msg"></p>              
             <el-form-item label="" prop="UserNo">
-              <el-input type="text" v-model="RegisterUser.UserNo" auto-complete="off" placeholder="请输入用户名" ></el-input>
+              <el-input type="text" v-model="RegisterUser.UserNo" auto-complete="off" placeholder="请输入用户名" prefix-icon="el-icon-user-solid"></el-input>
             </el-form-item>
             <el-form-item prop="Password">
-              <el-input :type="PassEye" v-model="RegisterUser.Password" auto-complete="off" placeholder="请输入密码">
+              <el-input :type="PassEye" v-model="RegisterUser.Password" auto-complete="off" placeholder="请输入密码" prefix-icon="el-icon-edit"> 
                <i slot="suffix" class="el-icon-view" @mousedown="PassEye= ''" @mouseup="PassEye='password'"></i>
                </el-input>
             </el-form-item>
             <el-form-item prop="ConfirmPassword">
-              <el-input :type="PassEye" v-model="RegisterUser.ConfirmPassword" auto-complete="off" placeholder="请再输入一遍密码">
+              <el-input :type="PassEye" v-model="RegisterUser.ConfirmPassword" auto-complete="off" placeholder="请再输入一遍密码" prefix-icon="el-icon-edit">
                <i slot="suffix" class="el-icon-view" @mousedown="PassEye= ''" @mouseup="PassEye='password'"></i>
                </el-input>
             </el-form-item>
-            <el-form-item label="" prop="Company">
-              <el-input type="text" v-model="RegisterUser.Company" auto-complete="off" placeholder="公司名称" ></el-input>
+            <el-form-item label="" prop="RegEmall">
+              <el-input type="text" v-model="RegisterUser.RegEmall" auto-complete="off" placeholder="需要通过邮箱接收验证码" >
+                <el-button slot="suffix" type="text" @click="sendVerifyCode">发送验证码</el-button>
+              </el-input>              
             </el-form-item>
-            <el-form-item label="" prop="MobilePhone">
-              <el-input type="text" v-model="RegisterUser.MobilePhone" auto-complete="off" placeholder="联系电话" ></el-input>
+            <el-form-item label="" prop="NewPassword">
+              <el-input type="text" v-model="RegisterUser.NewPassword" auto-complete="off" placeholder="验证码" ></el-input>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="submitForm" :loading="loading" style="width:100%">立即注册</el-button>
@@ -96,13 +97,15 @@ export default {
         UserNo:'',
         Password:'',
         ConfirmPassword:'',
-        Company:'',
-        MobilePhone:''
+        RegEmall:'',
+        NewPassword:''
       },
       RegisterRules: {
         UserNo: [{required: true, trigger: 'blur', validator: validateUserNo}],
         Password: [{required: true, trigger: 'blur', validator: validatePass}],
-        ConfirmPassword:[{required:true,trigger:'blur',validator:validateConfirmPass}]
+        ConfirmPassword:[{required:true,trigger:'blur',validator:validateConfirmPass}],        
+        RegEmall:[{required:true,type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }],
+        NewPassword:[{required:true,message: '请输入验证码', trigger: 'blur'}],
       }
     }
   },
@@ -114,6 +117,27 @@ export default {
         } else {
           return false
         }
+      })
+    },
+    sendVerifyCode(){
+      var email = this.RegisterUser.RegEmall;
+      if(!email){
+        this.$message({
+          message:'邮箱不能为空',
+          type:'error'
+        })
+        return;
+      }
+      this.$http.get('/api/login/sendverifycode?email='+email).then(res=>{
+        this.$message({
+          message: res.data.Result,
+          type: (res.data.Type == "Error"?'error':'success')
+        });     
+      }).catch(error=>{
+        this.$message({
+          message:err.message,
+          type:'error'
+        })
       })
     },
     redirect:function(){
@@ -141,9 +165,11 @@ export default {
             } else {
               this.$message({
                 message: '恭喜您注册成功，即将跳转到登录页!',
-                type: 'success'
-              });    
-              this.$router.push('/login');   
+                type: 'success',
+                onClose:function(){
+                  this.$router.push('/login');  
+                }
+              }); 
             }
           }).catch(error=> {
             this.loading = false
@@ -170,7 +196,6 @@ export default {
   mounted: function () {
     //this.getPublicKey()
   },
-
 }
 </script>
 
