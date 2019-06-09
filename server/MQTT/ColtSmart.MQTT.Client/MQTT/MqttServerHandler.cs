@@ -17,7 +17,6 @@ namespace ColtSmart.MQTT.Client
                                      IConnectingFailedHandler, IMqttClientConnectedHandler
     {
         private IDeviceService deviceService;
-        private ICollection<string> topicFilter = new List<string> { "device/#" };
 
         public MqttServerHandler(IDeviceService deviceService)
         {
@@ -32,8 +31,8 @@ namespace ColtSmart.MQTT.Client
         /// <returns></returns>
         public async Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
         {
-            var recvMsg = Encoding.UTF8.GetString(eventArgs.ApplicationMessage.Payload);
-            eventArgs.ProcessingFailed=await this.ProcessReceiveMessage(eventArgs.ApplicationMessage.Topic, recvMsg);
+            //var recvMsg = Encoding.UTF8.GetString(eventArgs.ApplicationMessage.Payload);
+            eventArgs.ProcessingFailed=await this.ProcessReceiveMessage(eventArgs.ApplicationMessage.Topic, eventArgs.ApplicationMessage.Payload);
         }
 
 
@@ -44,34 +43,67 @@ namespace ColtSmart.MQTT.Client
         /// <param name="clientId">设备Id</param>
         /// <param name="reciveMsg">接收消息</param>
         /// <returns></returns>
-        private async Task<bool> ProcessReceiveMessage(string topic,string reciveMsg)
+        private async Task<bool> ProcessReceiveMessage(string topic,byte[] payload)
         {
             var processingFailed = true;
 
             try
             {
-                var tInFo= GetRecvMsgType(topic);
-
-                switch (tInFo.Item1)
+                if (topic.EndsWith("/connected"))
                 {
-                    case "info":
-                        var dSetup =JsonHelper.DeserializeObject<DeviceSetup>(reciveMsg);
+                    var deviceId = "";
 
-                        if (!string.IsNullOrWhiteSpace(tInFo.Item2))
-                        {
-                          await this.ProcessDeviceSetup(dSetup.DeviceId, tInFo.Item2, dSetup);
-                            processingFailed = false;
-                        }
-                        break;
-                    case "data":
-                        break;
-                    case "offline":
-                        var deviceId = JsonHelper.DeserializeObject<string>(reciveMsg);
-                        await this.deviceService.UpdateOnline(deviceId,false);
-                        break;
+                    if (!string.IsNullOrWhiteSpace(deviceId))
+                    {
+                        await deviceService.UpdateOnline(deviceId, true);
+                    }
                 }
+                else if (topic.EndsWith("/disconnected"))
+                {
+                    var deviceId = "";
 
-            }catch(Exception ex)
+                    if (!string.IsNullOrWhiteSpace(deviceId))
+                    {
+                        await this.deviceService.UpdateOnline(deviceId, false);
+                    }
+                }
+                else
+                {
+                    #region
+                    var tInFo = GetRecvMsgType(topic);
+
+                    switch (tInFo.Item1)
+                    {
+                        case "info":
+                            {
+                                var recvMsg = Encoding.UTF8.GetString(payload);
+                                var dSetup = JsonHelper.DeserializeObject<DeviceSetup>(recvMsg);
+
+                                if (!string.IsNullOrWhiteSpace(tInFo.Item2))
+                                {
+                                    await this.ProcessDeviceSetup(dSetup.DeviceId, tInFo.Item2, dSetup);
+                                    processingFailed = false;
+                                }
+                            }
+                            break;
+                        case "data":
+                            {
+                                var netFlow= Math.Round((payload.Length * 1.0) / 1024, 2);
+                                await this.deviceService.UpdateDeviceNet(tInFo.Item3, netFlow); 
+                            }
+                            break;
+                        case "offline":
+                            {
+                                var recvMsg = Encoding.UTF8.GetString(payload);
+                                var deviceId = JsonHelper.DeserializeObject<string>(recvMsg);
+                                await this.deviceService.UpdateOnline(deviceId, false);
+                            }
+                            break;
+                    }
+                    #endregion
+                }
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine($"{ex.Message}；{ex.StackTrace}");
             }
@@ -83,10 +115,11 @@ namespace ColtSmart.MQTT.Client
         /// 获取执行类型
         /// </summary>
         /// <returns></returns>
-        private Tuple<string,string> GetRecvMsgType(string topic)
+        private Tuple<string,string,string> GetRecvMsgType(string topic)
         {
             var pType = "";
             var ownUser = "";
+            var deviceId = "";
 
             if (topic.EndsWith("/info"))
             {
@@ -94,6 +127,7 @@ namespace ColtSmart.MQTT.Client
             }else if (topic.EndsWith("/data"))
             {
                 pType = "data";
+
             }else if (topic.EndsWith("/offline"))
             {
                 pType = "offline";
@@ -101,8 +135,9 @@ namespace ColtSmart.MQTT.Client
 
             var tSpilt= topic.Split('/').ToList();
             ownUser = tSpilt.Count > 1 ? tSpilt[1] : "";
+            deviceId = tSpilt.Count > 3 ? tSpilt[3] : "";
 
-            return new Tuple<string, string>(pType,ownUser);
+            return new Tuple<string, string,string>(pType,ownUser,deviceId.Trim());
         }
 
         /// <summary>

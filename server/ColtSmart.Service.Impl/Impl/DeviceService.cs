@@ -141,5 +141,14 @@ namespace ColtSmart.Service.Impl
                 IsOnline = isOnline
             }, System.Data.CommandType.Text);
         }
+
+        public async Task UpdateDeviceNet(string deviceId, double netFlow)
+        {
+            await this.sqlExecutor.InsertAsync<DeviceNet>(new DeviceNet
+            {
+                 DeviceId=deviceId,
+                NetFlow =netFlow
+            });
+        }
     }
 }

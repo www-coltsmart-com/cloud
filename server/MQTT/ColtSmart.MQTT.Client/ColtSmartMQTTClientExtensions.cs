@@ -59,7 +59,7 @@ namespace ColtSmart.MQTT.Client
                 };
 
                 await mqttClient.ConnectAsync(options);
-                await mqttClient.SubscribeAsync("device/#");
+                await mqttClient.SubscribeAsync(new TopicFilter { Topic = "device/#" },new TopicFilter {  Topic= "${clientid}/connected" }, new TopicFilter { Topic = "${clientid}/disconnected" });
 
                 var mqttHandler= new MqttServerHandler(deviceService);
                 mqttClient.ApplicationMessageReceivedHandler= mqttHandler;

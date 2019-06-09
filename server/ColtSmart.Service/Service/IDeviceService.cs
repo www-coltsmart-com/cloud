@@ -31,5 +31,7 @@ namespace ColtSmart.Service
         Task<int> Delete(int id);
 
         Task UpdateOnline(string deviceId, bool isOnline);
+
+        Task UpdateDeviceNet(string deviceId, double netFlow);
     }
 }
