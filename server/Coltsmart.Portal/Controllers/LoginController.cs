@@ -57,7 +57,7 @@ namespace coltsmart.server.Controllers
             {
                 return new
                 {
-                    Id = user.Id,
+                    Id = user.id,
                     IsAdmin = user.UserType == EUserType.Admin,
                     TotalDevice = 1000,
                     TotalUser = 140,
@@ -116,8 +116,23 @@ namespace coltsmart.server.Controllers
         [Route("api/Login/savereg")]
         public async Task<ActionResult> Register([FromBody]TUser user)
         {
-            //TODO:增加注册逻辑，判断验证码
-
+            if(user == null ||string.IsNullOrEmpty(user.RegEmall))
+            {
+                return Json(new ErrorResult<string>("注册信息无效"));
+            }
+            if(string.IsNullOrEmpty(user.NewPassword))
+            {
+                return Json(new ErrorResult<string>("验证码不能为空"));
+            }
+            string verifyCode = "";
+            if(!cache.TryGetValue(user.RegEmall,out verifyCode)||string.IsNullOrEmpty(verifyCode))
+            {
+                return Json(new ErrorResult<string>("验证码无效，请重新获取新的验证码"));
+            }
+            if(0 != user.NewPassword.Trim().CompareTo(verifyCode))
+            {
+                return Json(new ErrorResult<string>("验证码不正确，请重新填写"));
+            }
 
             Dictionary<string, string> keyPair = GetRSAKeyPair();
             //解密登录密码

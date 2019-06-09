@@ -23,13 +23,14 @@
                </el-input>
             </el-form-item>
             <el-form-item prop="ConfirmPassword">
-              <el-input :type="PassEye" v-model="RegisterUser.ConfirmPassword" auto-complete="off" placeholder="请再输入一遍密码" prefix-icon="el-icon-edit">
-               <i slot="suffix" class="el-icon-view" @mousedown="PassEye= ''" @mouseup="PassEye='password'"></i>
+              <el-input :type="PassEye2" v-model="RegisterUser.ConfirmPassword" auto-complete="off" placeholder="请再输入一遍密码" prefix-icon="el-icon-edit">
+               <i slot="suffix" class="el-icon-view" @mousedown="PassEye2= ''" @mouseup="PassEye2='password'"></i>
                </el-input>
             </el-form-item>
             <el-form-item label="" prop="RegEmall">
               <el-input type="text" v-model="RegisterUser.RegEmall" auto-complete="off" placeholder="需要通过邮箱接收验证码" >
-                <el-button slot="suffix" type="text" @click="sendVerifyCode">发送验证码</el-button>
+                <el-button v-if="enbleVerifyCode" slot="suffix" type="text" @click="sendVerifyCode">发送验证码</el-button>
+                <el-button v-if="!enbleVerifyCode" slot="suffix" type="text" disabled>{{verify_time}}秒后重新发送</el-button>
               </el-input>              
             </el-form-item>
             <el-form-item label="" prop="NewPassword">
@@ -60,6 +61,7 @@
 <script>
 import JsEncrypt from 'jsencrypt'
 import 'element-ui/lib/theme-chalk/display.css';
+import { setInterval, clearInterval } from 'timers';
 
 export default {
   name: 'register',
@@ -92,7 +94,10 @@ export default {
     }
     return {
       PassEye: 'password',
+      PassEye2:'password',
       loading:false,
+      enbleVerifyCode:true,
+      verify_time:60,
       RegisterUser:{
         UserNo:'',
         Password:'',
@@ -128,6 +133,7 @@ export default {
         })
         return;
       }
+      this.enbleVerifyCode = false;
       this.$http.get('/api/login/sendverifycode?email='+email).then(res=>{
         this.$message({
           message: res.data.Result,
@@ -138,7 +144,16 @@ export default {
           message:err.message,
           type:'error'
         })
-      })
+      });
+      this.verify_time = 60;
+      var handle = setInterval(()=>{
+        this.verify_time--;
+        if(this.verify_time<=0){
+          this.verify_time = 60;
+          this.enbleVerifyCode = true;
+          clearInterval(handle);
+        }
+      },1000);
     },
     redirect:function(){
       this.$router.push('/login')
@@ -152,8 +167,8 @@ export default {
         var user = {
           UserNo:this.RegisterUser.UserNo,
           Password:encrypt.encrypt(this.RegisterUser.ConfirmPassword),
-          Company:this.RegisterUser.Company,
-          MobilePhone:this.RegisterUser.MobilePhone
+          RegEmall:this.RegisterUser.RegEmall,
+          NewPassword:this.RegisterUser.NewPassword
         };
         this.$http.post("api/Login/savereg", user,{rsa: true}).then((res)=>{
             this.loading = false
@@ -165,11 +180,9 @@ export default {
             } else {
               this.$message({
                 message: '恭喜您注册成功，即将跳转到登录页!',
-                type: 'success',
-                onClose:function(){
-                  this.$router.push('/login');  
-                }
+                type: 'success'
               }); 
+              this.$router.push('/login');
             }
           }).catch(error=> {
             this.loading = false

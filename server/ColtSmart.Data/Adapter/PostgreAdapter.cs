@@ -11,6 +11,6 @@ namespace ColtSmart.Data.Adapter
             PartsQryGenerator = new PostgrePartsQryGenerator();
         }
 
-        protected override string QueryLastId => " returning \"Id\" id";
+        protected override string QueryLastId => " returning \"id\" ";
     }
 }
