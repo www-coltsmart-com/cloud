@@ -38,6 +38,8 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="submitForm" :loading="loading" style="width:100%">立即注册</el-button>
+              <hr />
+              <p>已有账号，直接去<el-link type="primary" @click="redirect">登录</el-link>吧</p>
               <!-- <el-button type="primary" @click="redirect()" >登录</el-button> -->
             </el-form-item>
           </el-form>
@@ -61,7 +63,7 @@
 <script>
 import JsEncrypt from 'jsencrypt'
 import 'element-ui/lib/theme-chalk/display.css';
-import { setInterval, clearInterval } from 'timers';
+import { setInterval, clearInterval, setTimeout } from 'timers';
 
 export default {
   name: 'register',
@@ -182,7 +184,9 @@ export default {
                 message: '恭喜您注册成功，即将跳转到登录页!',
                 type: 'success'
               }); 
-              this.$router.push('/login');
+              setTimeout(()=>{
+                this.$router.push('/login');
+              },2000);              
             }
           }).catch(error=> {
             this.loading = false

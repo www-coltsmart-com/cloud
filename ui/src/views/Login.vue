@@ -14,13 +14,17 @@
             <h1 class="title">欢迎登录</h1>
             <p class="login-box-msg"></p>
             <el-form-item>
-              <el-input type="text" v-model="LoginUser.UserName" auto-complete="off" placeholder="请输入用户名" ref="uname"  @keyup.enter.native="jumponenter($event)"></el-input>
+              <el-input type="text" v-model="LoginUser.UserName" auto-complete="off" placeholder="请输入用户名" ref="uname"  @keyup.enter.native="jumponenter($event)" prefix-icon="el-icon-user-solid"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-input type="password" v-model="LoginUser.Password" auto-complete="off" placeholder="请输入密码" ref="pwd" @keyup.enter.native="jumponenter($event)"></el-input>
+              <el-input :type="PassEye" v-model="LoginUser.Password" auto-complete="off" placeholder="请输入密码" ref="pwd" @keyup.enter.native="jumponenter($event)" prefix-icon="el-icon-edit">
+                 <i slot="suffix" class="el-icon-view" @mousedown="PassEye= ''" @mouseup="PassEye='password'"></i>
+              </el-input>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="submitForm" :loading="loading" class="pull-right" style="width:100%" ref="login">登录</el-button>
+              <hr />
+              <p>还没有账号，现在就去<el-link type="primary" @click="redirect">注册</el-link>吧</p>
             </el-form-item>
           </el-form>
         </el-card>
@@ -69,7 +73,8 @@ export default {
         Password: [{required: true, trigger: 'blur', validator: validatePass}]
       },
       loading: false,
-      checked: true
+      checked: true,
+      PassEye: 'password',
     }
   },
   methods: {
@@ -147,6 +152,9 @@ export default {
       else if(phtext==="请输入密码"){
         this.submitForm()
       }
+    },
+    redirect:function(){
+      this.$router.push({ path: '/register' })
     }
   },
   mounted: function () {
