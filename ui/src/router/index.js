@@ -6,6 +6,7 @@ import Login from '@/views/Login'
 import Register from '@/views/Register'
 import ModifyPassword from '@/views/settings/ModifyPassword'
 import AccountInfo from '@/views/settings/AccountInfo'
+import ResetPassword from '@/views/ResetPassword'
 
 Vue.use(Router)
 
@@ -21,6 +22,12 @@ const router = new Router({
       path: '/register', 
       name: 'register',
       component: Register, 
+      hidden: true 
+    },
+    { 
+      path: '/resetpassword', 
+      name: 'resetpassword',
+      component: ResetPassword, 
       hidden: true 
     },
     {

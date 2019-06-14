@@ -114,31 +114,30 @@ namespace coltsmart.server.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("api/Login/savereg")]
-        public async Task<ActionResult> Register([FromBody]TUser user)
+        public async Task<IResult> Register([FromBody]TUser user)
         {
             if(user == null ||string.IsNullOrEmpty(user.RegEmall))
             {
-                return Json(new ErrorResult<string>("注册信息无效"));
+                return new ErrorResult<string>("注册信息无效");
             }
             if(string.IsNullOrEmpty(user.NewPassword))
             {
-                return Json(new ErrorResult<string>("验证码不能为空"));
+                return new ErrorResult<string>("验证码不能为空");
             }
             string verifyCode = "";
             if(!cache.TryGetValue(user.RegEmall,out verifyCode)||string.IsNullOrEmpty(verifyCode))
             {
-                return Json(new ErrorResult<string>("验证码无效，请重新获取新的验证码"));
+                return new ErrorResult<string>("验证码无效，请重新获取新的验证码");
             }
             if(0 != user.NewPassword.Trim().CompareTo(verifyCode))
             {
-                return Json(new ErrorResult<string>("验证码不正确，请重新填写"));
+                return new ErrorResult<string>("验证码不正确，请重新填写");
             }
 
             Dictionary<string, string> keyPair = GetRSAKeyPair();
             //解密登录密码
             user.Password = EncryptionProvider.DecryptRSA(user.Password, keyPair["PRIVATE"]);
-            var result = await userService.Register(user);
-            return Json(result);
+            return await userService.Register(user);
         }
 
         [HttpGet]
@@ -218,5 +217,30 @@ namespace coltsmart.server.Controllers
 
             return await userService.ModifyPassword(user);
         }
+        
+        [HttpPost]
+        [Route("api/Login/resetpassword")]
+        public async Task<IResult> ResetPassword([FromBody]TUser user)
+        {
+            if(user == null ||string.IsNullOrEmpty(user.RegEmall))
+            {
+                return new ErrorResult<string>("注册信息无效");
+            }
+            if(string.IsNullOrEmpty(user.NewPassword))
+            {
+                return new ErrorResult<string>("验证码不能为空");
+            }
+            string verifyCode = "";
+            if(!cache.TryGetValue(user.RegEmall,out verifyCode)||string.IsNullOrEmpty(verifyCode))
+            {
+                return new ErrorResult<string>("验证码无效，请重新获取新的验证码");
+            }
+            if(0 != user.NewPassword.Trim().CompareTo(verifyCode))
+            {
+                return new ErrorResult<string>("验证码不正确，请重新填写");
+            }
+            return await userService.ResetPassword(user);
+        }
+
     }
 }

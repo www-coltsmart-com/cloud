@@ -36,6 +36,21 @@ namespace ColtSmart.Service.Impl
             return new BaseResult<int>(result);
         }
 
+        public async Task<IResult> ResetPassword(TUser user)
+        {
+            if (user == null || string.IsNullOrEmpty(user.RegEmall) )
+            {
+                return new ErrorResult<string>("邮箱不能为空");
+            }
+            var users = await sqlExecutor.FindAsync<TUser>(new { RegEmall = user.RegEmall });
+            var retUser = users.FirstOrDefault();
+            if (retUser == null)
+                return new ErrorResult<string>("该邮箱未注册");
+            retUser.Password = retUser.NewPassword = EncryptHelper.Instance.PassEncryption(user.UserNo, "654321");
+            var result = await sqlExecutor.UpdateAsync<TUser>(retUser);
+            return new BaseResult<int>(result);
+        }
+
         public bool VerifyUser(string usercode, string password)
         {
             var user = sqlExecutor.Find<TUser>(new { UserNo = usercode }).FirstOrDefault();

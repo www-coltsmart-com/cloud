@@ -9,6 +9,8 @@ namespace ColtSmart.Service.Service
 
         Task<IResult> ModifyPassword(TUser user);
 
+        Task<IResult> ResetPassword(TUser user);
+
         TUser GetUser(string userno);
 
         Task<PagedResult<TUser>> GetUsers(int page, int pageSize, string userName);

@@ -24,7 +24,8 @@
             <el-form-item>
               <el-button type="primary" @click="submitForm" :loading="loading" class="pull-right" style="width:100%" ref="login">登录</el-button>
               <hr />
-              <p>还没有账号，现在就去<el-link type="primary" @click="redirect">注册</el-link>吧</p>
+              <p>还没有账号，现在就去<el-link type="primary" @click="redirect">注册</el-link>吧<br />
+              忘记密码了，申请<el-link type="danger" @click="resetPassword">重置</el-link>密码</p>
             </el-form-item>
           </el-form>
         </el-card>
@@ -155,6 +156,9 @@ export default {
     },
     redirect:function(){
       this.$router.push({ path: '/register' })
+    },
+    resetPassword:function(){
+      this.$router.push({ path: '/resetpassword' })
     }
   },
   mounted: function () {
