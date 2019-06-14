@@ -112,6 +112,9 @@ router.beforeEach((to, from, next) => {
     else if (to.name === 'register') {
       next()
     }
+    else if(to.name="resetpassword"){
+      next();
+    }
     else {
       next({name: 'login'});
     }
