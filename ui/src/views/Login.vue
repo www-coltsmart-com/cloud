@@ -1,46 +1,67 @@
 <template>
- <div class="login">
-    <el-row >
-      <el-col class="login-logo" :offset="1" :span="2">
-        <img src="../assets/logo.png" width="200px"/>
-      </el-col>
-    </el-row>
-    <el-row class="login-center" type="flex" :style="'background: url(' + require('../assets/bg.png') + ') no-repeat scroll center center / cover;' " justify="center">
-      <el-col :xs="12" :sm="10" :md="8" :lg="8" :xl="6">
-        <div style="height:80px;" class="hidden-lg-and-down"></div>
-        <div style="height:80px;" ></div>
-        <el-card class="login-box" >
-          <el-form :model="LoginUser" ref="LoginUser" :rules="LoginRules" status-icon> 
-            <h1 class="title">欢迎登录</h1>
-            <p class="login-box-msg"></p>
-            <el-form-item>
-              <el-input type="text" v-model="LoginUser.UserName" auto-complete="off" placeholder="请输入用户名" ref="uname"  @keyup.enter.native="jumponenter($event)" prefix-icon="el-icon-user-solid"></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-input :type="PassEye" v-model="LoginUser.Password" auto-complete="off" placeholder="请输入密码" ref="pwd" @keyup.enter.native="jumponenter($event)" prefix-icon="el-icon-edit">
-                 <i slot="suffix" class="el-icon-view" @mousedown="PassEye= ''" @mouseup="PassEye='password'"></i>
-              </el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="submitForm" :loading="loading" class="pull-right" style="width:100%" ref="login">登录</el-button>
-              <hr />
-              <p>还没有账号，现在就去<el-link type="primary" @click="redirect">注册</el-link>吧<br />
-              忘记密码了，申请<el-link type="danger" @click="resetPassword">重置</el-link>密码</p>
-            </el-form-item>
-          </el-form>
-        </el-card>
-        <div style="height:50px;" ></div>
-        <div style="height:80px;" class="hidden-lg-and-down"></div>
-      </el-col>
-    </el-row>
-    <el-row type="flex" justify="center">
-      <el-col :span="12">
-      <div class="login-bottom" >
-        <span> ©&nbsp;2018 &nbsp;&nbsp; 上海市鸣驹智能科技有限公司 &nbsp;&nbsp; 技术支持 </span>
-      </div>
-      </el-col>
-    </el-row>
-  </div>
+<section>
+  <div class="login">
+      <el-row >
+        <el-col class="login-logo" :offset="1" :span="2">
+          <img src="../assets/logo.png" width="200px"/>
+        </el-col>
+      </el-row>
+      <el-row class="login-center" type="flex" :style="'background: url(' + require('../assets/bg.png') + ') no-repeat scroll center center / cover;' " justify="center">
+        <el-col :xs="12" :sm="10" :md="8" :lg="8" :xl="6">
+          <div style="height:80px;" class="hidden-lg-and-down"></div>
+          <div style="height:80px;" ></div>
+          <el-card class="login-box" >
+            <el-form :model="LoginUser" ref="LoginUser" :rules="LoginRules" status-icon> 
+              <h1 class="title">欢迎登录</h1>
+              <p class="login-box-msg"></p>
+              <el-form-item>
+                <el-input type="text" v-model="LoginUser.UserName" auto-complete="off" placeholder="请输入用户名" ref="uname"  @keyup.enter.native="jumponenter($event)" prefix-icon="el-icon-user-solid"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-input :type="PassEye" v-model="LoginUser.Password" auto-complete="off" placeholder="请输入密码" ref="pwd" @keyup.enter.native="jumponenter($event)" prefix-icon="el-icon-edit">
+                  <i slot="suffix" class="el-icon-view" @mousedown="PassEye= ''" @mouseup="PassEye='password'"></i>
+                </el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="submitForm" :loading="loading" class="pull-right" style="width:100%" ref="login">登录</el-button>
+                <hr />
+                <p>还没有账号，现在就去<el-link type="primary" @click="redirect">注册</el-link>吧<br />
+                忘记密码了，申请<el-link type="danger" @click="resetPassword">重置</el-link>密码</p>
+              </el-form-item>
+            </el-form>
+          </el-card>
+          <div style="height:50px;" ></div>
+          <div style="height:80px;" class="hidden-lg-and-down"></div>
+        </el-col>
+      </el-row>
+      <el-row type="flex" justify="center">
+        <el-col :span="12">
+        <div class="login-bottom" >
+          <span> ©&nbsp;2018 &nbsp;&nbsp; 上海市鸣驹智能科技有限公司 &nbsp;&nbsp; 技术支持 </span>
+        </div>
+        </el-col>
+      </el-row>    
+    </div>
+    <!--密码重置弹出窗-->
+		<el-dialog title="密码重置" :visible.sync="ResetPassword.visible" :close-on-click-modal="false">
+			<el-form :model="ResetPassword.data" label-width="100px" :rules="ResetPassword.rules" ref="ResetPasswordForm">
+				<el-form-item label="电子邮箱" prop="email">
+					<el-input type="text" v-model="ResetPassword.data.email" auto-complete="off" placeholder="需要通过邮箱接收验证码" >
+                <el-button v-if="ResetPassword.enble_verify_code==0" slot="suffix" type="text" disabled>发送验证码</el-button>
+                <el-button v-if="ResetPassword.enble_verify_code==1" slot="suffix" type="text" @click="sendVerifyCode">发送验证码</el-button>
+                <el-button v-if="ResetPassword.enble_verify_code==2" slot="suffix" type="text" disabled>{{ResetPassword.verify_time}}秒后重新发送</el-button>
+              </el-input>  
+				</el-form-item>
+				<el-form-item label="验证码" prop="verify_code">
+					<el-input type="text" v-model="ResetPassword.data.verify_code" auto-complete="off" placeholder="验证码" ></el-input>
+				</el-form-item>
+			</el-form>
+			<div slot="footer" class="dialog-footer">
+				<el-button @click.native="ResetPassword.visible = false">取消</el-button>
+				<el-button type="primary" @click.native="ResetSubmit" :loading="ResetPassword.loading">重置</el-button>
+			</div>
+		</el-dialog>
+  </section>
 </template>
 
 <script>
@@ -64,6 +85,15 @@ export default {
         callback()
       }
     }
+    const validateEmail = (rule,value,callback) =>{
+      if(value.length <= 0){
+        this.ResetPassword.enble_verify_code = 0;
+        callback(new Error('请输入邮箱地址'));
+      }else{
+        this.ResetPassword.enble_verify_code = 1;
+        callback();
+      }
+    }
     return {
       LoginUser: {
         UserName: '',
@@ -76,6 +106,23 @@ export default {
       loading: false,
       checked: true,
       PassEye: 'password',
+      ResetPassword:{
+        visible:false,
+        loading:false,
+        enble_verify_code:0,
+        verify_time:60,
+        rules:{
+          email:[
+            { required: true, trigger: ['blur','change'],validator:validateEmail },
+			      { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+          ],
+          verify_code:[{required:true,message: '请输入验证码', trigger: 'blur'}],
+        },
+        data:{
+          email:'',
+          verify_code:''
+        }
+      }
     }
   },
   methods: {
@@ -117,8 +164,7 @@ export default {
                       message: '客户编码为空或不存在，登录失败',
                       type: 'error'
                     })
-                  }
-                  else {
+                  } else {
                   this.loading = false
                     this.$message({
                       message: error.message,
@@ -158,14 +204,87 @@ export default {
       this.$router.push({ path: '/register' })
     },
     resetPassword:function(){
-      this.$router.push({ path: '/resetpassword' })
+      this.ResetPassword.visible = true;
+      this.ResetPassword.data = {
+        email:'',
+        verify_code:''
+      };
+    },
+    sendVerifyCode:function(){
+      var email = this.ResetPassword.data.email;
+      if(!email){
+        this.$message({
+          message:'邮箱不能为空',
+          type:'error'
+        })
+        return;
+      }
+      this.ResetPassword.enble_verify_code = 2;
+      this.$http.get('/api/login/sendverifycode?email='+email).then(res=>{
+        if(res.data.Type == "Error"){
+            this.$message({
+              message:err.message,
+              type:'error'
+            })
+          return;
+        }
+        this.$message({
+          message: res.data.Result,
+          type: 'success'
+        });   
+        this.ResetPassword.verify_time = 60;
+        var handle = setInterval(()=>{
+          this.ResetPassword.verify_time--;
+          if(this.ResetPassword.verify_time<=0){
+            this.ResetPassword.verify_time = 60;
+            this.ResetPassword.enble_verify_code = 1;
+            clearInterval(handle);
+          }
+        },1000);     
+      }).catch(error=>{
+        this.$message({
+          message:err.message,
+          type:'error'
+        })
+      });      
+    },
+    ResetSubmit:function(){
+      this.$refs['ResetPasswordForm'].validate((valid) => {
+        if (valid) {
+          this.ResetPassword.loading = true;
+          this.$http.post("api/Login/resetpassword", {
+              RegEmall:this.ResetPassword.data.email,
+              NewPassword:this.ResetPassword.data.verify_code
+          }).then((res)=>{
+              this.ResetPassword.loading = false
+              if (res.data.Type == "Error"){
+                  this.$message({
+                      message: res.data.Result,
+                      type: 'error'
+                  })
+              } else {
+                  this.$message({
+                      message: '密码重置成功，请重新登录!',
+                      type: 'success'
+                  });              
+                  this.resetPassword.visible = false;
+              }
+          }).catch(error=> {
+              this.loading = false
+              this.$message({
+                  message: error.message,
+                  type: 'error'
+              })
+          });
+        } else {
+          return false;
+        }
+      });
     }
   },
   mounted: function () {
-    //this.getPublicKey()
     this.$refs.uname.focus()
   },
-
 }
 </script>
 <style>

@@ -149,11 +149,7 @@ namespace coltsmart.server.Controllers
             {
                 return new ErrorResult<string>("邮箱不能为空");
             }
-            if(!System.Text.RegularExpressions.Regex.IsMatch(email, @"^\w+@\w+\.\w+$"))
-            {
-                return new ErrorResult<string>("邮箱格式不正确");
-            }
-
+ 
             //生成6为随机验证码
             string verifyCode = CreateVerifyCode(6);
 
