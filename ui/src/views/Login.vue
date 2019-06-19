@@ -45,6 +45,9 @@
     <!--密码重置弹出窗-->
 		<el-dialog title="密码重置" :visible.sync="ResetPassword.visible" :close-on-click-modal="false">
 			<el-form :model="ResetPassword.data" label-width="100px" :rules="ResetPassword.rules" ref="ResetPasswordForm">
+         <el-form-item label="用户名" prop="uname">
+          <el-input type="text" v-model="ResetPassword.data.uname" auto-complete="off" placeholder="请输入用户名"></el-input>
+        </el-form-item>
 				<el-form-item label="电子邮箱" prop="email">
 					<el-input type="text" v-model="ResetPassword.data.email" auto-complete="off" placeholder="需要通过邮箱接收验证码" >
                 <el-button v-if="ResetPassword.enble_verify_code==0" slot="suffix" type="text" disabled>发送验证码</el-button>
@@ -112,13 +115,17 @@ export default {
         enble_verify_code:0,
         verify_time:60,
         rules:{
+          uname:[{required:true,message: '请输入用户名', trigger: 'blur'}],
           email:[
-            { required: true, trigger: ['blur','change'],validator:validateEmail },
+            { required: true, trigger: ['blur','change'], validator: validateEmail },
 			      { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
           ],
-          verify_code:[{required:true,message: '请输入验证码', trigger: 'blur'}],
+          verify_code:[
+            { required: true, message: '请输入验证码', trigger: 'blur' }
+          ],
         },
         data:{
+          uname:'',
           email:'',
           verify_code:''
         }
@@ -133,70 +140,68 @@ export default {
           this.loading = true
           this.getPublicKey((publickey) => {
             var encrypt = new JSEncrypt();
-              encrypt.setPublicKey(publickey);
+            encrypt.setPublicKey(publickey);
 
-              var user = {
-                UserName: this.LoginUser.UserName,
-                Password: encrypt.encrypt(this.LoginUser.Password)
-              }
-              this.$http.post('/api/login', user, { rsa: true})
-                .then(res => {
-                  
-                  // 登录成功
-                  this.loading = false
-                  if (res.data) {
-                    // 储存 token
-                    //token.set(res.data)
-                   that.$router.push({ path: '/HomeIndex' })
-                  }
-                  localStorage.UserName = this.LoginUser.UserName
-                })
-                .catch(error => {
-                  this.loading = false
-                  if (error.response.status == 401) {
-                    this.$message({
-                      message: '用户名或密码错误，登录失败1',
-                      type: 'error'
-                    })
-                  }
-                  else if (error.response.status == 405) {
-                    this.$message({
-                      message: '客户编码为空或不存在，登录失败',
-                      type: 'error'
-                    })
-                  } else {
-                  this.loading = false
-                    this.$message({
-                      message: error.message,
-                      type: 'error'
-                    })
-                  }
-                })
+            var user = {
+              UserName: this.LoginUser.UserName,
+              Password: encrypt.encrypt(this.LoginUser.Password)
+            }
+            this.$http.post('/api/login', user, { rsa: true})
+              .then(res => {
+                
+                // 登录成功
+                this.loading = false
+                if (res.data) {
+                  // 储存 token
+                  //token.set(res.data)
+                  that.$router.push({ path: '/HomeIndex' })
+                }
+                localStorage.UserName = this.LoginUser.UserName
+              })
+              .catch(error => {
+                this.loading = false
+                if (error.response.status == 401) {
+                  this.$message({
+                    message: '用户名或密码错误，登录失败1',
+                    type: 'error'
+                  })
+                }
+                else if (error.response.status == 405) {
+                  this.$message({
+                    message: '客户编码为空或不存在，登录失败',
+                    type: 'error'
+                  })
+                } else {
+                this.loading = false
+                  this.$message({
+                    message: error.message,
+                    type: 'error'
+                  })
+                }
+              })
          })    
         } else {
-          // console.log('error submit!!')
           return false
         }
       })
     },
     getPublicKey: function (callback) {
       this.$http.get('/api/login/getpublickey').then(res => {
-              //localStorage.setItem("publickey", res.data)
-              if(callback)
-                callback(res.data)
-          }).catch(error => {  
-             this.$message({
-                  message: error.message,
-                  type: 'error'
-                })       
-          })
+          //localStorage.setItem("publickey", res.data)
+          if(callback)
+            callback(res.data)
+      }).catch(error => {  
+          this.$message({
+              message: error.message,
+              type: 'error'
+            })       
+      })
     },
     jumponenter:function(e){
-      const phtext=e.target.getAttribute('placeholder');
+      const phtext = e.target.getAttribute('placeholder');
       if(phtext==="请输入用户名"){
         this.$refs.pwd.focus()
-      }
-      else if(phtext==="请输入密码"){
+      } else if(phtext==="请输入密码"){
         this.submitForm()
       }
     },
@@ -206,6 +211,7 @@ export default {
     resetPassword:function(){
       this.ResetPassword.visible = true;
       this.ResetPassword.data = {
+        uname:'',
         email:'',
         verify_code:''
       };
@@ -253,6 +259,7 @@ export default {
         if (valid) {
           this.ResetPassword.loading = true;
           this.$http.post("api/Login/resetpassword", {
+              UserName:this.ResetPassword.data.uname,
               RegEmall:this.ResetPassword.data.email,
               NewPassword:this.ResetPassword.data.verify_code
           }).then((res)=>{
@@ -267,7 +274,7 @@ export default {
                       message: '密码重置成功，请重新登录!',
                       type: 'success'
                   });              
-                  this.resetPassword.visible = false;
+                  this.ResetPassword.visible = false;
               }
           }).catch(error=> {
               this.loading = false

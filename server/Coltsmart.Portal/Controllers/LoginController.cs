@@ -222,7 +222,11 @@ namespace coltsmart.server.Controllers
             {
                 return new ErrorResult<string>("注册信息无效");
             }
-            if(string.IsNullOrEmpty(user.NewPassword))
+            if (string.IsNullOrEmpty(user.UserName))
+            {
+                return new ErrorResult<string>("用户名不能为空");
+            }
+            if (string.IsNullOrEmpty(user.NewPassword))
             {
                 return new ErrorResult<string>("验证码不能为空");
             }

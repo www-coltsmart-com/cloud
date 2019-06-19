@@ -42,10 +42,10 @@ namespace ColtSmart.Service.Impl
             {
                 return new ErrorResult<string>("邮箱不能为空");
             }
-            var users = await sqlExecutor.FindAsync<TUser>(new { RegEmall = user.RegEmall });
+            var users = await sqlExecutor.FindAsync<TUser>(new { UserNo = user.UserName,RegEmall = user.RegEmall });
             var retUser = users.FirstOrDefault();
             if (retUser == null)
-                return new ErrorResult<string>("该邮箱未注册");
+                return new ErrorResult<string>("邮箱或用户名不正确");
             retUser.Password = retUser.NewPassword = EncryptHelper.Instance.PassEncryption(user.UserNo, "654321");
             var result = await sqlExecutor.UpdateAsync<TUser>(retUser);
             return new BaseResult<int>(result);
