@@ -59,6 +59,12 @@ const router = new Router({
           name: '设备列表',
           hidden: false,
           component: () => import('@/views/devicelist/index')
+        },
+        {
+          path: '/HomeIndex',
+          name: '首页',
+          hidden: false,
+          component: () => import('@/views/layout/index')
         }
       ]
     }
@@ -112,9 +118,11 @@ router.beforeEach((to, from, next) => {
     else if (to.name === 'register') {
       next()
     }
+    /*
     else if(to.name="resetpassword"){
       next();
     }
+    */
     else {
       next({name: 'login'});
     }
