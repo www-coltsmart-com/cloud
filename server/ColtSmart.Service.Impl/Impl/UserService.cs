@@ -38,15 +38,15 @@ namespace ColtSmart.Service.Impl
 
         public async Task<IResult> ResetPassword(TUser user)
         {
-            if (user == null || string.IsNullOrEmpty(user.RegEmall) )
+            if (user == null || string.IsNullOrEmpty(user.RegEmall))
             {
                 return new ErrorResult<string>("邮箱不能为空");
             }
-            var users = await sqlExecutor.FindAsync<TUser>(new { UserNo = user.UserName,RegEmall = user.RegEmall });
+            var users = await sqlExecutor.FindAsync<TUser>(new { UserNo = user.UserName, RegEmall = user.RegEmall });
             var retUser = users.FirstOrDefault();
             if (retUser == null)
                 return new ErrorResult<string>("邮箱或用户名不正确");
-            retUser.Password = retUser.NewPassword = EncryptHelper.Instance.PassEncryption(user.UserNo, "654321");
+            retUser.Password = retUser.NewPassword = EncryptHelper.Instance.PassEncryption(retUser.UserNo, "654321");
             var result = await sqlExecutor.UpdateAsync<TUser>(retUser);
             return new BaseResult<int>(result);
         }
@@ -54,10 +54,10 @@ namespace ColtSmart.Service.Impl
         public bool VerifyUser(string usercode, string password)
         {
             var user = sqlExecutor.Find<TUser>(new { UserNo = usercode }).FirstOrDefault();
-            var encrptPassword = EncryptHelper.Instance.PassEncryption(usercode, password);
-
-            var ret = user != null && user.Password == encrptPassword;
-            return ret;
+            if (user == null) return false;
+            var encrptPassword = EncryptHelper.Instance.PassEncryption(user.UserNo, password);
+            string str = EncryptHelper.Instance.PassEncryption(user.UserNo, "654321");
+            return user.Password == encrptPassword;
         }
 
         public TUser GetUser(string userno)

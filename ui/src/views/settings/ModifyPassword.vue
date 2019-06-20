@@ -6,7 +6,7 @@
         <el-form-item label="用户名" prop="UserNo">
             <el-input v-model="user.UserNo" auto-complete="off" disabled></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="Password">
+        <el-form-item label="原密码" prop="Password">
             <el-input :type="PassEye" v-model="user.Password" auto-complete="off">
                 <i slot="suffix" class="el-icon-view" @mousedown="PassEye= ''" @mouseup="PassEye='password'"></i>
             </el-input>
@@ -36,7 +36,7 @@ export default {
             },
             rules: {  		
                 Password: [
-                    { required: true, message: '请输入密码', trigger: 'blur' }
+                    { required: true, message: '请输入原密码', trigger: 'blur' }
                 ],		
                 NewPassword: [
                     { required: true, message: '请输入新密码', trigger: 'blur' }
@@ -104,7 +104,8 @@ export default {
         }
     },
     mounted: function () {
-        this.user.UserNo = localStorage.UserName
+        alert(localStorage.UserName);
+        this.user.UserNo = localStorage.UserName;        
     }
 }
 </script>

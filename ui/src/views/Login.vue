@@ -156,7 +156,7 @@ export default {
                   //token.set(res.data)
                   that.$router.push({ path: '/HomeIndex' })
                 }
-                localStorage.UserName = this.LoginUser.UserName
+                localStorage.UserName = this.LoginUser.UserName;                
               })
               .catch(error => {
                 this.loading = false
