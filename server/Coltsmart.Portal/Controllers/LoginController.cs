@@ -67,6 +67,7 @@ namespace coltsmart.server.Controllers
                     Company = user.Company,
                     RegDate = user.RegDate,
                     IsDefaultPassword = user.Password.Equals(EncryptHelper.Instance.PassEncryption(user.UserNo, "654321"))
+                    //IsDefaultPassword = false
                 };
             }
             else

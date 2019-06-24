@@ -87,6 +87,7 @@ export default {
       this.$confirm('确认退出吗?', '提示', {
         type: 'warning'
       }).then(() => {
+        localStorage.clear();
         this.$router.push('/login');
       }).catch(() => {
       })
@@ -104,7 +105,8 @@ export default {
     getUserInfo:function(){
       this.$http.get('api/Login/userinfo?userName='+this.user.username,).then((res)=>{
         if(res.data.Id ==0){
-          this.$router.push('/Login')
+          localStorage.clear();
+          this.$router.push('/login');
         }
         else{
           this.user.id=res.data.Id;
@@ -119,7 +121,8 @@ export default {
             }).then(() => {
               this.$router.push('/password')
             }).catch(() => {
-              this.$router.push('/Login')         
+              localStorage.clear();
+              this.$router.push('/login');    
             });
           }
           if(this.user.isAdmin){
