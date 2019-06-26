@@ -53,12 +53,7 @@ const router = new Router({
           hidden: false,
           component: () => import('@/views/devicelist/index')
         },
-        {
-          path: '/HomeIndex',
-          name: '首页',
-          hidden: false,
-          component: () => import('@/views/layout/index')
-        }
+        
       ]
     }
   ]
