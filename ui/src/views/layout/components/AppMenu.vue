@@ -57,7 +57,7 @@ export default {
     },
   },
   mounted: function () {
-     // this.activeMenu = '/process'
+      this.activeMenu = '/home'
       this.$router.afterEach((to, from) => {
          this.activeMenu = to.path
         })

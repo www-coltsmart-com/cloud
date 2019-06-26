@@ -35,11 +35,18 @@ const router = new Router({
           hidden: true,
           component: AccountInfo
         },
+        
         {
           path: '/password',
           name: '修改密码',
           hidden: true,
           component: ModifyPassword
+        },
+        {
+          path: '/home',
+          name: '用户中心',
+          hidden: false,
+          component: () => import('@/views/home/index')
         },
         {
           path: '/userlist',
@@ -52,8 +59,7 @@ const router = new Router({
           name: '设备列表',
           hidden: false,
           component: () => import('@/views/devicelist/index')
-        },
-        
+        }
       ]
     }
   ]

@@ -154,7 +154,7 @@ export default {
                 if (res.data) {
                   // 储存 token
                   //token.set(res.data)
-                  that.$router.push({ path: '/' })
+                  that.$router.push({ path: '/home' })
                 }
                 localStorage.UserName = this.LoginUser.UserName;                
               })
