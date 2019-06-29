@@ -33,5 +33,7 @@ namespace ColtSmart.Service
         Task UpdateOnline(string deviceId, bool isOnline);
 
         Task UpdateDeviceNet(string deviceId, double netFlow);
+
+        Task<int> GetDeviceCount(string userNo, bool isOnline = false);
     }
 }

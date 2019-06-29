@@ -20,5 +20,7 @@ namespace ColtSmart.Service.Service
         Task<IResult> Create(TUser user);
 
         Task<IResult> Register(TUser user);
+
+        Task<int> GetUserCount();
     }
 }

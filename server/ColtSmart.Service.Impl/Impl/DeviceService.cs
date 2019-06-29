@@ -146,9 +146,33 @@ namespace ColtSmart.Service.Impl
         {
             await this.sqlExecutor.InsertAsync<DeviceNet>(new DeviceNet
             {
-                 DeviceId=deviceId,
-                NetFlow =netFlow
+                DeviceId = deviceId,
+                NetFlow = netFlow
             });
+        }
+
+        public async Task<int> GetDeviceCount(string userNo, bool isOnline = false)
+        {
+            //拼接SQL字符串
+            StringBuilder sqlBuilder = new StringBuilder();
+            if (!string.IsNullOrEmpty(userNo))
+            {
+                if (sqlBuilder.Length > 0) sqlBuilder.Append(" AND ");
+                sqlBuilder.Append("\"UserOwn\" = @UserOwn");
+            }
+            if (isOnline)
+            {
+                if (sqlBuilder.Length > 0) sqlBuilder.Append(" AND ");
+                sqlBuilder.Append("\"IsOnline\" = @IsOnline");
+            }
+            object param = new
+            {
+                UserOwn = userNo,
+                IsOnline = isOnline
+            };
+            if (sqlBuilder.Length > 0) sqlBuilder.Insert(0, " WHERE ");
+            sqlBuilder.Insert(0, "SELECT COUNT(1) FROM device");
+            return await sqlExecutor.ExecuteScalarAsync<int>(sqlBuilder.ToString(), param);
         }
     }
 }

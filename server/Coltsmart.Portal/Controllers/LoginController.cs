@@ -15,20 +15,23 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Text;
+using Coltsmart.Portal.Models;
 
 namespace coltsmart.server.Controllers
 {
     public class LoginController : ApiController
     {
         private IUserService userService = null;
+        private IDeviceService deviceService = null;
         private readonly DbOptions dbOptions = null;
         private readonly IMemoryCache cache;
 
         public object EncryptionManager { get; private set; }
 
-        public LoginController(IUserService userService, DbOptions dbOptions, IMemoryCache cache)
+        public LoginController(IUserService userService, IDeviceService deviceService, DbOptions dbOptions, IMemoryCache cache)
         {
             this.userService = userService;
+            this.deviceService = deviceService;
             this.dbOptions = dbOptions;
             this.cache = cache;
         }
@@ -89,6 +92,44 @@ namespace coltsmart.server.Controllers
         }
 
         [HttpGet]
+        [Route("api/Login/getstatsinfo")]
+        public async Task<IResult> GetStatsInfo(string userNo)
+        {
+            if (string.IsNullOrEmpty(userNo))
+            {
+                return new ErrorResult<string>("当前用户无效");
+            }
+            string key = string.Format("{0}_STATS_INFO", userNo);
+             if (cache.Get(key) == null)
+            {
+                var user = userService.GetUser(userNo);
+                if (user == null)
+                {
+                    return new ErrorResult<string>("当前用户无效");
+                }
+                bool isAdmin = user.UserType == EUserType.Admin;//判断是否为管理员身份，用于显示不同权限的统计数据
+                int totalDeviceCount = await deviceService.GetDeviceCount((isAdmin ? "": user.UserNo));
+                int onlineDeviceCount = await deviceService.GetDeviceCount((isAdmin ? "" : user.UserNo), true);
+                int totalUserCount = await userService.GetUserCount();
+                var value = new StatsInfo()
+                {
+                    TotalDeviceCount = totalDeviceCount,
+                    TotalDeviceDisplay = true,
+                    OnlineDeviceCount = onlineDeviceCount,
+                    OnlineDeviceDisplay = true,
+                    TotalUserCount = totalUserCount,
+                    TotalUserDisplay = isAdmin
+                };
+                cache.Set(key, value, new DateTimeOffset(DateTime.Now.AddMinutes(5)));
+                return new BaseResult<StatsInfo>(value);
+            }
+            else
+            {
+                return new BaseResult<StatsInfo>(cache.Get(key) as StatsInfo);
+            }
+        }
+
+        [HttpGet]
         [AllowAnonymous]
         [Route("api/Login/getpublickey")]
         public string GetPublicKey()
@@ -117,20 +158,20 @@ namespace coltsmart.server.Controllers
         [Route("api/Login/savereg")]
         public async Task<IResult> Register([FromBody]TUser user)
         {
-            if(user == null ||string.IsNullOrEmpty(user.RegEmall))
+            if (user == null || string.IsNullOrEmpty(user.RegEmall))
             {
                 return new ErrorResult<string>("注册信息无效");
             }
-            if(string.IsNullOrEmpty(user.NewPassword))
+            if (string.IsNullOrEmpty(user.NewPassword))
             {
                 return new ErrorResult<string>("验证码不能为空");
             }
             string verifyCode = "";
-            if(!cache.TryGetValue(user.RegEmall,out verifyCode)||string.IsNullOrEmpty(verifyCode))
+            if (!cache.TryGetValue(user.RegEmall, out verifyCode) || string.IsNullOrEmpty(verifyCode))
             {
                 return new ErrorResult<string>("验证码无效，请重新获取新的验证码");
             }
-            if(0 != user.NewPassword.Trim().CompareTo(verifyCode))
+            if (0 != user.NewPassword.Trim().CompareTo(verifyCode))
             {
                 return new ErrorResult<string>("验证码不正确，请重新填写");
             }
@@ -150,7 +191,7 @@ namespace coltsmart.server.Controllers
             {
                 return new ErrorResult<string>("邮箱不能为空");
             }
- 
+
             //生成6为随机验证码
             string verifyCode = CreateVerifyCode(6);
 
@@ -168,7 +209,7 @@ namespace coltsmart.server.Controllers
             message.Body = defaultBody.Replace("{code}", verifyCode);
 
             //发送邮件
-            SmtpClient client = new SmtpClient(defaultHost,defaultPort);           
+            SmtpClient client = new SmtpClient(defaultHost, defaultPort);
             client.EnableSsl = true;
             client.UseDefaultCredentials = false;
             client.Credentials = new NetworkCredential(defaultEmail, authCode);
@@ -214,12 +255,12 @@ namespace coltsmart.server.Controllers
 
             return await userService.ModifyPassword(user);
         }
-        
+
         [HttpPost]
         [Route("api/Login/resetpassword")]
         public async Task<IResult> ResetPassword([FromBody]TUser user)
         {
-            if(user == null ||string.IsNullOrEmpty(user.RegEmall))
+            if (user == null || string.IsNullOrEmpty(user.RegEmall))
             {
                 return new ErrorResult<string>("注册信息无效");
             }
@@ -232,11 +273,11 @@ namespace coltsmart.server.Controllers
                 return new ErrorResult<string>("验证码不能为空");
             }
             string verifyCode = "";
-            if(!cache.TryGetValue(user.RegEmall,out verifyCode)||string.IsNullOrEmpty(verifyCode))
+            if (!cache.TryGetValue(user.RegEmall, out verifyCode) || string.IsNullOrEmpty(verifyCode))
             {
                 return new ErrorResult<string>("验证码无效，请重新获取新的验证码");
             }
-            if(0 != user.NewPassword.Trim().CompareTo(verifyCode))
+            if (0 != user.NewPassword.Trim().CompareTo(verifyCode))
             {
                 return new ErrorResult<string>("验证码不正确，请重新填写");
             }

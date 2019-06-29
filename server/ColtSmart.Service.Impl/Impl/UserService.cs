@@ -135,5 +135,10 @@ namespace ColtSmart.Service.Impl
             int result = await sqlExecutor.InsertAsync<TUser>(user);
             return new BaseResult<int>(result);
         }
+
+        public async Task<int> GetUserCount()
+        {
+            return await sqlExecutor.ExecuteScalarAsync<int>("SELECT * FROM tuser");
+        }
     }
 }
