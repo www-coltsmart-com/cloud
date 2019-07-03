@@ -72,7 +72,7 @@ const router = new Router({
   ]
 });
 
-const tokenIsExpired = function() {
+const tokenIsExpired = function () {
   if (localStorage.expiration) {
     var expirationDt = new Date(localStorage.expiration);
     if (expirationDt.getTime() < new Date().getTime()) {
@@ -82,7 +82,7 @@ const tokenIsExpired = function() {
   return false;
 };
 
-const checkRegistion = function() {
+const checkRegistion = function () {
   return axios
     .get("api/Login/checkri", {
       baseURL: process.env.BASE_URL,
