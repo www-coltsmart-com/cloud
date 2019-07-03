@@ -28,7 +28,7 @@ namespace ColtSmart.Service.Impl
             }
             object param = new
             {
-                Name = name
+                Name = string.Format("{0}%", name ?? "")
             };
             if (sqlBuilder.Length > 0) sqlBuilder.Insert(0, " WHERE ");
             sqlBuilder.Insert(0, "SELECT * FROM goods");
