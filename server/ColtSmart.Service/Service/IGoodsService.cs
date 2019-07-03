@@ -8,6 +8,8 @@ namespace ColtSmart.Service.Service
     {
         Task<PagedResult<Goods>> GetGoods(int page,int pageSize,string name);
 
+        Task<Goods> GetGoods(int id);
+
         Task<IEnumerable<GoodsAttr>> GetGoodsAttributes(int goodsId);
 
         Task<IEnumerable<GoodsAttach>> GetGoodsAttachments(int goodsId);

@@ -18,6 +18,10 @@ namespace ColtSmart.Entity.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         /// <summary>
+        /// 产品标识
+        /// </summary>
+        public int GoodsId { get; set; }
+        /// <summary>
         /// 附件名称
         /// </summary>
         public string Name { get; set; }
@@ -33,5 +37,9 @@ namespace ColtSmart.Entity.Entities
         /// 附件路径
         /// </summary>
         public string Path { get; set; }
+        /// <summary>
+        /// 显示顺序
+        /// </summary>
+        public int DisplayOrder { get; set; }
     }
 }

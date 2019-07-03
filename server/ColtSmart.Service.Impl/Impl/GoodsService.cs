@@ -36,6 +36,12 @@ namespace ColtSmart.Service.Impl
             return results.ToPagedResult();
         }
 
+        public async Task<Goods> GetGoods(int id)
+        {
+            var results = await sqlExecutor.FindAsync<Goods>(new { id = id });
+            return results.FirstOrDefault();
+        }
+
         public async Task<IEnumerable<GoodsAttr>> GetGoodsAttributes(int goodsId)
         {
             return await sqlExecutor.FindAsync<GoodsAttr>(new { GoodsId = goodsId });
