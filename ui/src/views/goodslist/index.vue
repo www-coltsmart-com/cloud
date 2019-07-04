@@ -53,12 +53,12 @@
       ></el-pagination>
     </el-col>
 
-    <el-dialog title="新增产品" :visible.sync="item.visible" :close-on-click-modal="false">
+    <el-dialog title="新增产品" :visible.sync="item.visible" :close-on-click-modal="false" width="60%">
       <el-form :model="item.data" :rules="item.rules" ref="form">
         <el-form-item label="产品名称" prop="name" label-width="100px">
           <el-input v-model="item.data.name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="图片" prop="picture" label-width="10px">
+        <el-form-item label="图片" prop="picture" label-width="100px">
           <el-upload
             class="avatar-uploader"
             action="https://jsonplaceholder.typicode.com/posts/"
@@ -82,15 +82,49 @@
         <el-form-item label="显示顺序" prop="display_order" label-width="100px">
           <el-input-number v-model="item.data.display_order" :min="0" :max="999999" label="显示顺序"></el-input-number>
         </el-form-item>
-        <el-tabs v-model="activeTabName">
+        <el-tabs v-model="item.activeTabName">
           <el-tab-pane label="详细信息" name="detail">
-              <!-- See More From Here : https://www.jianshu.com/p/4e00f11583fa -->
+            <quill-editor
+              v-model="item.data.description"
+              ref="myQuillEditor"
+              class="editer"
+              :options="item.editorOption"
+            ></quill-editor>
           </el-tab-pane>
           <el-tab-pane label="规格参数" name="paramter">
-            
+            <el-button type="primary" size="mini" @click="$refs.editable.insert()">新增</el-button>
+            <el-button type="danger" size="mini" @click="$refs.editable.removeSelecteds()">删除选中</el-button>
+            <elx-editable ref="editable" :data.sync="item.data.attr">
+              <elx-editable-column type="selection" width="55"></elx-editable-column>
+              <elx-editable-column type="index" width="55"></elx-editable-column>
+              <elx-editable-column
+                prop="Name"
+                label="规格"
+                :edit-render="{name: 'ElInput'}"
+                width="150"
+              ></elx-editable-column>
+              <elx-editable-column
+                prop="Value"
+                label="参数"
+                :edit-render="{name: 'ElInput'}"
+                width="360"
+              ></elx-editable-column>
+              <elx-editable-column
+                prop="DisplayOrder"
+                label="排序"
+                :edit-render="{name: 'ElInputNumber'}"
+              ></elx-editable-column>
+            </elx-editable>
           </el-tab-pane>
           <el-tab-pane label="附件清单" name="dowload">
-            
+            <el-upload
+              class="upload-demo"
+              action="https://jsonplaceholder.typicode.com/posts/"
+              :file-list="item.data.attach"
+            >
+              <el-button size="mini" type="primary">点击上传</el-button>
+              <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+            </el-upload>
           </el-tab-pane>
         </el-tabs>
       </el-form>
@@ -123,7 +157,6 @@ export default {
       item: {
         visible: false,
         loading: false,
-        activeTabName:'detail',
         rules: [],
         data: {
           id: 0,
@@ -132,8 +165,19 @@ export default {
           info: "",
           description: "",
           display_order: 0,
-          attr: [],
+          attr: [
+            {
+              name: "规格",
+              value: "参数",
+              display_order: 0
+            }
+          ],
           attach: []
+        },
+        activeTabName: "detail",
+        editorOption: {
+          placeholder: "请在这里描述一下产品的具体细节",
+          modules: {}
         }
       }
     };
@@ -198,7 +242,15 @@ export default {
         info: "",
         description: "",
         display_order: 0,
-        attr: [],
+        attr: [
+          {
+            id: 0,
+            GoodsId: 0,
+            Name: "规格",
+            Value: "参数",
+            DisplayOrder: 1
+          }
+        ],
         attach: []
       };
     },
@@ -222,6 +274,11 @@ export default {
       return isJPG && isLt2M;
     }
   },
+  computed: {
+    editor() {
+      return this.$refs.myQuillEditor.quillEditor;
+    }
+  },
   mounted: function() {
     this.query();
   }
@@ -241,14 +298,22 @@ export default {
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
-  width: 178px;
-  height: 178px;
-  line-height: 178px;
+  width: 80px;
+  height: 80px;
+  line-height: 80px;
   text-align: center;
 }
 .avatar {
-  width: 178px;
-  height: 178px;
+  width: 80px;
+  height: 80px;
   display: block;
 }
+.el-tab-pane {
+  height: 300px;
+}
+.ql-editor.ql-blank,
+.ql-editor{
+height: 250px;
+}
+
 </style>

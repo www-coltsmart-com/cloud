@@ -9,13 +9,24 @@ import Axios from './axios/axios'
 import token from './utils/token'
 import 'babel-polyfill'
 
+import quillEditor from 'vue-quill-editor'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
+import 'vue-element-extends/lib/index.css'
+import { Editable, EditableColumn } from 'vue-element-extends'
+
 Vue.config.productionTip = false
 
-Vue.use(ElementUI,{ size: 'small' })
+Vue.use(ElementUI, { size: 'small' })
 Vue.use(token)
 Vue.use(Axios)
+Vue.use(quillEditor)
+Vue.use(Editable)
+Vue.use(EditableColumn)
 
-window.onbeforeunload = function(){
+window.onbeforeunload = function () {
   token.clear()
 }
 
