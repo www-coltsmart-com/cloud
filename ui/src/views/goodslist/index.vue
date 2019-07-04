@@ -58,9 +58,41 @@
         <el-form-item label="产品名称" prop="name" label-width="100px">
           <el-input v-model="item.data.name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="简介" prop="info" label-width="100px">
-          <el-input type="textarea" v-model="item.data.info" auto-complete="off"></el-input>
+        <el-form-item label="图片" prop="picture" label-width="10px">
+          <el-upload
+            class="avatar-uploader"
+            action="https://jsonplaceholder.typicode.com/posts/"
+            :show-file-list="false"
+            :on-success="onAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+          >
+            <img v-if="item.data.picture" :src="item.data.picture" class="avatar" />
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
         </el-form-item>
+        <el-form-item label="简介" prop="info" label-width="100px">
+          <el-input
+            type="textarea"
+            v-model="item.data.info"
+            :autosize="{ minRows: 2, maxRows: 4}"
+            placeholder="请简单描述一下产品的基本信息"
+            auto-complete="off"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="显示顺序" prop="display_order" label-width="100px">
+          <el-input-number v-model="item.data.display_order" :min="0" :max="999999" label="显示顺序"></el-input-number>
+        </el-form-item>
+        <el-tabs v-model="activeTabName">
+          <el-tab-pane label="详细信息" name="detail">
+              <!-- See More From Here : https://www.jianshu.com/p/4e00f11583fa -->
+          </el-tab-pane>
+          <el-tab-pane label="规格参数" name="paramter">
+            
+          </el-tab-pane>
+          <el-tab-pane label="附件清单" name="dowload">
+            
+          </el-tab-pane>
+        </el-tabs>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="item.visible = false">取消</el-button>
@@ -91,6 +123,7 @@ export default {
       item: {
         visible: false,
         loading: false,
+        activeTabName:'detail',
         rules: [],
         data: {
           id: 0,
@@ -172,6 +205,21 @@ export default {
     saveItem: function() {},
     page_change: function(val) {
       this.query();
+    },
+    onAvatarSuccess(res, file) {
+      this.item.data.picture = URL.createObjectURL(file.raw);
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG 格式!");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!");
+      }
+      return isJPG && isLt2M;
     }
   },
   mounted: function() {
@@ -180,4 +228,27 @@ export default {
 };
 </script>
 <style>
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
 </style>
