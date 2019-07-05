@@ -61,7 +61,7 @@
         <el-form-item label="图片" prop="picture" label-width="100px">
           <el-upload
             class="avatar-uploader"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            :action="updateURL"
             :show-file-list="false"
             :on-success="onAvatarSuccess"
             :before-upload="beforeAvatarUpload"
@@ -117,11 +117,7 @@
             </elx-editable>
           </el-tab-pane>
           <el-tab-pane label="附件清单" name="dowload">
-            <el-upload
-              class="upload-demo"
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :file-list="item.data.attach"
-            >
+            <el-upload class="upload-demo" :action="updateURL" :file-list="item.data.attach">
               <el-button size="mini" type="primary">点击上传</el-button>
               <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
             </el-upload>
@@ -157,7 +153,9 @@ export default {
       item: {
         visible: false,
         loading: false,
-        rules: [],
+        rules: {
+          name: [{ required: true, message: "请输入名称", trigger: "blur" }]
+        },
         data: {
           id: 0,
           name: "",
@@ -263,13 +261,13 @@ export default {
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === "image/jpeg";
-      const isLt2M = file.size / 1024 / 1024 < 2;
+      const isLt2M = file.size / 1024 / 1024 < 4;
 
       if (!isJPG) {
         this.$message.error("上传头像图片只能是 JPG 格式!");
       }
       if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
+        this.$message.error("上传头像图片大小不能超过 4MB!");
       }
       return isJPG && isLt2M;
     }
@@ -277,6 +275,9 @@ export default {
   computed: {
     editor() {
       return this.$refs.myQuillEditor.quillEditor;
+    },
+    updateURL() {
+      return process.env.BASE_URL + "/api/uploadfile";
     }
   },
   mounted: function() {
@@ -312,8 +313,7 @@ export default {
   height: 300px;
 }
 .ql-editor.ql-blank,
-.ql-editor{
-height: 250px;
+.ql-editor {
+  height: 250px;
 }
-
 </style>

@@ -1,7 +1,7 @@
 <template>
   <section>
     <el-row :gutter="20">
-      <el-col :v-show="total_device_display" :span="6" key="total_device">
+      <el-col :v-show="stats.total_device_display" :span="6" key="total_device">
         <el-card>
           <div>
             <el-row>
@@ -18,7 +18,7 @@
               </el-col>
             </el-row>
             <div>
-              <hr>
+              <hr />
               <div class="info">
                 <i class="el-icon-info"></i> 总设备数量
               </div>
@@ -26,7 +26,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :v-show="online_device_display" :span="6" key="online_device">
+      <el-col :v-show="stats.online_device_display" :span="6" key="online_device">
         <el-card>
           <div>
             <el-row>
@@ -43,7 +43,7 @@
               </el-col>
             </el-row>
             <div>
-              <hr>
+              <hr />
               <div class="info">
                 <i class="el-icon-info"></i> 当前在线的设备数量
               </div>
@@ -51,7 +51,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :v-show="total_user_display" :span="6" key="total_user">
+      <el-col :v-show="stats.total_user_display" :span="6" key="total_user">
         <el-card>
           <div>
             <el-row>
@@ -68,7 +68,7 @@
               </el-col>
             </el-row>
             <div>
-              <hr>
+              <hr />
               <div class="info">
                 <i class="el-icon-info"></i> 用户总数量
               </div>
