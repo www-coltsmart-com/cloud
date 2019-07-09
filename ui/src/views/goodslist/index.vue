@@ -3,7 +3,7 @@
     <el-col :span="24" class="toolbar">
       <el-form :inline="true" :model="filter">
         <el-form-item>
-          <el-input v-model="filter.name" placeholder="名称"></el-input>
+          <el-input v-model="filter.name" placeholder="产品名称"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button
@@ -33,10 +33,17 @@
         <template slot-scope="scope">
           <span v-if="scope.row.Status==0" style="color:blue">未发布</span>
           <span v-if="scope.row.Status==1" style="color:green">已发布</span>
+          <span v-else style="color:red">其他</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="primary"
+            icon="el-icon-edit-outline"
+            @click="editItem(scope.row)"
+          ></el-button>
           <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteItem(scope.row)"></el-button>
         </template>
       </el-table-column>
@@ -94,39 +101,47 @@
           <el-tab-pane label="规格参数" name="paramter">
             <el-button type="primary" size="mini" @click="$refs.editable.insert()">新增</el-button>
             <el-button type="danger" size="mini" @click="$refs.editable.removeSelecteds()">删除选中</el-button>
-            <elx-editable ref="editable" :data.sync="item.data.attr">
+            <elx-editable ref="editable" :data.sync="item.data.attrs">
               <elx-editable-column type="selection" width="55"></elx-editable-column>
               <elx-editable-column type="index" width="55"></elx-editable-column>
               <elx-editable-column
-                prop="Name"
+                prop="name"
                 label="规格"
                 :edit-render="{name: 'ElInput'}"
                 width="150"
               ></elx-editable-column>
               <elx-editable-column
-                prop="Value"
+                prop="value"
                 label="参数"
                 :edit-render="{name: 'ElInput'}"
                 width="360"
               ></elx-editable-column>
               <elx-editable-column
-                prop="DisplayOrder"
+                prop="display_order"
                 label="排序"
                 :edit-render="{name: 'ElInputNumber'}"
               ></elx-editable-column>
             </elx-editable>
           </el-tab-pane>
           <el-tab-pane label="附件清单" name="dowload">
-            <el-upload class="upload-demo" :action="updateURL" :file-list="item.data.attach">
-              <el-button size="mini" type="primary">点击上传</el-button>
-              <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+            <el-upload
+              class="upload-demo"
+              :action="updateURL"
+              multiple
+              :on-success="onFileSuccess"
+              :before-upload="beforeFileUpload"
+              :on-change="onFileChange"
+              :file-list="item.data.downloads"
+            >
+              <el-button size="mini" type="primary">上传</el-button>
+              <div slot="tip" class="el-upload__tip">上传文件格式不限，文件大小不得超过10M</div>
             </el-upload>
           </el-tab-pane>
         </el-tabs>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="item.visible = false">取消</el-button>
-        <el-button type="primary" @click="saveItem">保存</el-button>
+        <el-button type="primary" @click="saveItem" :loading="item.loading">保存</el-button>
       </div>
     </el-dialog>
   </section>
@@ -163,14 +178,8 @@ export default {
           info: "",
           description: "",
           display_order: 0,
-          attr: [
-            {
-              name: "规格",
-              value: "参数",
-              display_order: 0
-            }
-          ],
-          attach: []
+          attrs: [],
+          downloads: []
         },
         activeTabName: "detail",
         editorOption: {
@@ -207,6 +216,9 @@ export default {
           this.error(err.message);
         });
     },
+    page_change: function(val) {
+      this.query();
+    },
     deleteItem: function(row) {
       this.$confirm("确认是否要删除该记录吗？", "提示", { type: "warning" })
         .then(() => {
@@ -216,8 +228,7 @@ export default {
             .then(() => {
               this.table.loading = false;
               this.$message("删除成功");
-              this.page.index = 1;
-              this.query();
+              search();
             })
             .catch(error => {
               this.table.loading = false;
@@ -231,6 +242,10 @@ export default {
         })
         .catch(() => {});
     },
+    editItem: function(row) {
+      this.item.visible = true;
+      //TODO:edit form
+    },
     addItem: function() {
       this.item.visible = true;
       this.item.data = {
@@ -240,21 +255,15 @@ export default {
         info: "",
         description: "",
         display_order: 0,
-        attr: [
-          {
-            id: 0,
-            GoodsId: 0,
-            Name: "规格",
-            Value: "参数",
-            DisplayOrder: 1
-          }
-        ],
-        attach: []
+        attrs: [],
+        downloads: []
       };
     },
-    saveItem: function() {},
-    page_change: function(val) {
-      this.query();
+    saveItem: function() {
+      this.item.loading = true;
+      var model = this.item.data;
+      console.log(model);
+      this.item.loading = false;
     },
     onAvatarSuccess(res, file) {
       this.item.data.picture = URL.createObjectURL(file.raw);
@@ -264,12 +273,26 @@ export default {
       const isLt2M = file.size / 1024 / 1024 < 4;
 
       if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
+        this.$message.error("上传图片只能是 JPG 格式!");
       }
       if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 4MB!");
+        this.$message.error("上传图片大小不能超过 4MB!");
       }
       return isJPG && isLt2M;
+    },
+    onFileSuccess(response, file, fileList) {
+      file.url = URL.createObjectURL(file.raw);
+    },
+    beforeFileUpload(file) {
+      const isLt2M = file.size / 1024 / 1024 < 25;
+
+      if (!isLt2M) {
+        this.$message.error("上传大小不能超过 25MB!");
+      }
+      return isLt2M;
+    },
+    onFileChange(file, fileList) {
+      this.item.data.downloads = fileList;
     }
   },
   computed: {

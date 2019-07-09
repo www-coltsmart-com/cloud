@@ -22,6 +22,7 @@ namespace Coltsmart.Portal.Controllers
             this.goodsService = goodsService;
         }
 
+        //分页获取列表
         [HttpGet]
         [Route("api/goods")]
         public async Task<PagedResult<Goods>> Get(int page, int size, string name)
@@ -29,27 +30,30 @@ namespace Coltsmart.Portal.Controllers
             return await goodsService.GetGoods(page, size, name);
         }
 
+        //获取单条记录
         [HttpGet]
         [Route("api/goods/{id}")]
-        public async Task<Goods> Get(int id)
+        public async Task<IResult> Get(int id)
         {
-            return await goodsService.GetGoods(id);
+            try
+            {
+                if (id <= 0) throw new System.Exception("参数无效");
+                var goods = await goodsService.GetGoods(id);
+                if (goods == null) throw new System.Exception("产品信息不存在");
+                var attrs = await goodsService.GetGoodsAttributes(id);
+                var downloads = await goodsService.GetGoodsAttachments(id);
+                var result = goods.ToModel();
+                result.attrs = attrs.ToModel();
+                result.downloads = downloads.ToModel();
+                return new BaseResult<GoodsModel>(result);
+            }
+            catch (System.Exception ex)
+            {
+                return new ErrorResult<string>(ex.Message);
+            }
         }
 
-        [HttpGet]
-        [Route("api/goods/{id}/attr")]
-        public async Task<IEnumerable<GoodsAttr>> GetAttr(int goodsId)
-        {
-            return await goodsService.GetGoodsAttributes(goodsId);
-        }
-
-        [HttpGet]
-        [Route("api/goods/{id}/attach")]
-        public async Task<IEnumerable<GoodsAttach>> GetAttach(int goodsId)
-        {
-            return await goodsService.GetGoodsAttachments(goodsId);
-        }
-
+        //删除
         [HttpDelete]
         [Route("api/goods/{id}")]
         public async Task<int> Delete(int id)
@@ -57,6 +61,7 @@ namespace Coltsmart.Portal.Controllers
             return await goodsService.Delete(id);
         }
 
+        //上传图片
         [HttpPost]
         [Route("api/uploadfile")]
         public async Task<IActionResult> UploadFile(IFormFile file)
@@ -77,37 +82,22 @@ namespace Coltsmart.Portal.Controllers
             });
         }
 
-
         [HttpPost]
-        [Route("api/uploadfiles")]
-        public async Task<IActionResult> UploadFiles(List<IFormFile> files)
+        [Route("api/goods")]
+        public async Task<IResult> Save([FromBody]GoodsModel goods)
         {
-            long size = files.Sum(f => f.Length);
-
-            var filePath = Path.GetTempFileName();
-
-            foreach (var file in files)
+            if (goods == null)
+                return new ErrorResult<string>("信息无效，请重新提交");
+            int result = 0;
+            if (goods.id > 0)
             {
-                if (file.Length > 0)
-                {
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
-                }
+                result = await goodsService.Update(goods.ToEntity(), goods.attrs.ToEntity(), goods.downloads.ToEntity());
             }
-
-            return Ok(new
+            else
             {
-                count = files.Count,
-                size,
-                filePath
-            });
+                result = await goodsService.Insert(goods.ToEntity(), goods.attrs.ToEntity(), goods.downloads.ToEntity());
+            }
+            return new BaseResult<int>(result);
         }
-
-        /* public async Task<int> Insert(GoodsModel goods)
-        {
-            throw new System.Exception();
-        } */
     }
 }

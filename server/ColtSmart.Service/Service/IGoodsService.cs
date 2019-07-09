@@ -6,7 +6,7 @@ namespace ColtSmart.Service.Service
 {
     public interface IGoodsService
     {
-        Task<PagedResult<Goods>> GetGoods(int page,int pageSize,string name);
+        Task<PagedResult<Goods>> GetGoods(int page, int pageSize, string name);
 
         Task<Goods> GetGoods(int id);
 
@@ -14,9 +14,9 @@ namespace ColtSmart.Service.Service
 
         Task<IEnumerable<GoodsAttach>> GetGoodsAttachments(int goodsId);
 
-        Task<int> Insert(Goods goods);
+        Task<int> Insert(Goods goods, IEnumerable<GoodsAttr> attrs, IEnumerable<GoodsAttach> downloads);
 
-        Task<int> Update(Goods goods);
+        Task<int> Update(Goods goods, IEnumerable<GoodsAttr> attrs, IEnumerable<GoodsAttach> downloads);
 
         Task<int> Delete(int id);
     }
