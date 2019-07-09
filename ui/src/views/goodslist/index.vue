@@ -28,15 +28,16 @@
     >
       <el-table-column prop="DisplayOrder" label="序号" width="60" sortable></el-table-column>
       <el-table-column prop="Name" label="名称" width="250" sortable></el-table-column>
-      <el-table-column prop="Info" label="简介" width="500"></el-table-column>
+      <el-table-column prop="Info" label="简介" width="400"></el-table-column>
       <el-table-column label="状态" width="100">
         <template slot-scope="scope">
           <span v-if="scope.row.Status==0" style="color:blue">未发布</span>
           <span v-if="scope.row.Status==1" style="color:green">已发布</span>
-          <span v-else style="color:red">其他</span>
+          <span v-if="scope.row.Status<0" style="color:red">其他</span>
+          <span v-if="scope.row.Status>1" style="color:red">其他</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="100">
+      <el-table-column label="操作" width="150">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -86,8 +87,8 @@
             auto-complete="off"
           ></el-input>
         </el-form-item>
-        <el-form-item label="显示顺序" prop="display_order" label-width="100px">
-          <el-input-number v-model="item.data.display_order" :min="0" :max="999999" label="显示顺序"></el-input-number>
+        <el-form-item label="显示顺序" prop="displayOrder" label-width="100px">
+          <el-input-number v-model="item.data.displayOrder" :min="0" :max="999999" label="显示顺序"></el-input-number>
         </el-form-item>
         <el-tabs v-model="item.activeTabName">
           <el-tab-pane label="详细信息" name="detail">
@@ -117,7 +118,7 @@
                 width="360"
               ></elx-editable-column>
               <elx-editable-column
-                prop="display_order"
+                prop="displayOrder"
                 label="排序"
                 :edit-render="{name: 'ElInputNumber'}"
               ></elx-editable-column>
@@ -177,7 +178,7 @@ export default {
           picture: "",
           info: "",
           description: "",
-          display_order: 0,
+          displayOrder: 0,
           attrs: [],
           downloads: []
         },
@@ -228,7 +229,7 @@ export default {
             .then(() => {
               this.table.loading = false;
               this.$message("删除成功");
-              search();
+              this.search();
             })
             .catch(error => {
               this.table.loading = false;
@@ -243,8 +244,33 @@ export default {
         .catch(() => {});
     },
     editItem: function(row) {
-      this.item.visible = true;
-      //TODO:edit form
+      this.table.loading = true;
+      this.$http
+        .get("api/goods/" + row.id)
+        .then(res => {
+          if (res.data.Type == "Success") {
+            this.table.loading = false;
+            this.item.visible = true;
+            this.item.data = res.data.Result;
+          } else {
+            this.table.loading = false;
+            this.$message({
+              message: res.data.Result,
+              type: "error",
+              duration: 0,
+              showClose: true
+            });
+          }
+        })
+        .catch(error => {
+          this.table.loading = false;
+          this.$message({
+            message: error.message,
+            type: "error",
+            duration: 0,
+            showClose: true
+          });
+        });
     },
     addItem: function() {
       this.item.visible = true;
@@ -254,16 +280,30 @@ export default {
         picture: "",
         info: "",
         description: "",
-        display_order: 0,
+        displayOrder: 0,
         attrs: [],
         downloads: []
       };
     },
     saveItem: function() {
       this.item.loading = true;
-      var model = this.item.data;
-      console.log(model);
-      this.item.loading = false;
+      this.$http
+        .post("api/goods", this.item.data)
+        .then(res => {
+          this.$message({ message: "提交成功", type: "success" });
+          this.$refs["form"].resetFields();
+          this.item.loading = false;
+          this.query();
+        })
+        .catch(error => {
+          this.item.loading = false;
+          this.$message({
+            message: error.message,
+            type: "error",
+            duration: 0,
+            showClose: true
+          });
+        });
     },
     onAvatarSuccess(res, file) {
       this.item.data.picture = URL.createObjectURL(file.raw);

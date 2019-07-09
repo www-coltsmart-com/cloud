@@ -37,9 +37,5 @@ namespace ColtSmart.Entity.Entities
         /// 附件路径
         /// </summary>
         public string Path { get; set; }
-        /// <summary>
-        /// 显示顺序
-        /// </summary>
-        public int DisplayOrder { get; set; }
     }
 }

@@ -10,7 +10,6 @@ CREATE TABLE public.goodsattach
     "Ext" character varying(50) COLLATE pg_catalog."default",
     "Size" integer DEFAULT 0,
     "Path" character varying(250) COLLATE pg_catalog."default",
-    "DisplayOrder" integer,
     CONSTRAINT goodsattach_pk PRIMARY KEY (id)
 )
 WITH (
