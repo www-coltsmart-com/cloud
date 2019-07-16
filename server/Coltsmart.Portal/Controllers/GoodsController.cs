@@ -11,6 +11,7 @@ using System.Web.Http;
 using System.Linq;
 using System.IO;
 using Coltsmart.Portal.Models;
+using System;
 
 namespace Coltsmart.Portal.Controllers
 {
@@ -19,7 +20,7 @@ namespace Coltsmart.Portal.Controllers
         private readonly IHostingEnvironment hostingEnvironment;
         private IGoodsService goodsService = null;
 
-        public GoodsController(IHostingEnvironment hostingEnvironment,IGoodsService goodsService)
+        public GoodsController(IHostingEnvironment hostingEnvironment, IGoodsService goodsService)
         {
             this.hostingEnvironment = hostingEnvironment;
             this.goodsService = goodsService;
@@ -69,14 +70,22 @@ namespace Coltsmart.Portal.Controllers
         [Route("api/uploadfile")]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
-            string path = hostingEnvironment.
-            
-
-
-
-
-            var filePath = Path.GetTempFileName();
-
+            string tempPath = hostingEnvironment.WebRootPath + @"\upload\temp\";
+            //删除历史缓存图片
+            string oldPath = tempPath + @"\" + DateTime.Today.AddDays(-7).ToString("yyyyMMdd");
+            if (Directory.Exists(oldPath))
+            {
+                Directory.Delete(oldPath);
+            }
+            //新建缓存文件夹
+            string newPath = tempPath + @"\" + DateTime.Today.ToString("yyyyMMdd");
+            if (!Directory.Exists(newPath))
+            {
+                Directory.CreateDirectory(newPath);
+            }
+            //重新命名，防止重复
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+            string filePath = newPath + @"\" + fileName;
             if (file.Length > 0)
             {
                 using (var stream = new FileStream(filePath, FileMode.Create))
@@ -86,8 +95,10 @@ namespace Coltsmart.Portal.Controllers
             }
             return Ok(new
             {
+                name = file.FileName,
+                ext = Path.GetExtension(file.FileName),
                 size = file.Length,
-                filePath
+                path = filePath
             });
         }
 
@@ -97,6 +108,11 @@ namespace Coltsmart.Portal.Controllers
         {
             if (goods == null)
                 return new ErrorResult<string>("信息无效，请重新提交");
+            //TODO:处理文件
+
+
+
+
             int result = 0;
             if (goods.id > 0)
             {
