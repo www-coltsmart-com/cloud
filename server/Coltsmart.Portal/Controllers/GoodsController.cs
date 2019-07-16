@@ -2,6 +2,7 @@ using ColtSmart.Entity;
 using ColtSmart.Entity.Entities;
 using ColtSmart.Service;
 using ColtSmart.Service.Service;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
@@ -15,10 +16,12 @@ namespace Coltsmart.Portal.Controllers
 {
     public class GoodsController : ApiController
     {
+        private readonly IHostingEnvironment hostingEnvironment;
         private IGoodsService goodsService = null;
 
-        public GoodsController(IGoodsService goodsService)
+        public GoodsController(IHostingEnvironment hostingEnvironment,IGoodsService goodsService)
         {
+            this.hostingEnvironment = hostingEnvironment;
             this.goodsService = goodsService;
         }
 
@@ -66,6 +69,12 @@ namespace Coltsmart.Portal.Controllers
         [Route("api/uploadfile")]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
+            string path = hostingEnvironment.
+            
+
+
+
+
             var filePath = Path.GetTempFileName();
 
             if (file.Length > 0)

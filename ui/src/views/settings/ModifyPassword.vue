@@ -1,111 +1,123 @@
 <template>
- <el-tabs value="first" type="border-card">
+  <el-tabs value="first" type="border-card">
     <el-tab-pane label="修改密码" name="first">
-      
-    <el-form :model="user" label-width="80px" style="width:400px;" :rules="rules" ref="editForm">
+      <el-form :model="user" label-width="80px" style="width:400px;" :rules="rules" ref="editForm">
         <el-form-item label="用户名" prop="UserNo">
-            <el-input v-model="user.UserNo" auto-complete="off" disabled></el-input>
+          <el-input v-model="user.UserNo" auto-complete="off" disabled></el-input>
         </el-form-item>
         <el-form-item label="原密码" prop="Password">
-            <el-input :type="PassEye" v-model="user.Password" auto-complete="off">
-                <i slot="suffix" class="el-icon-view" @mousedown="PassEye= ''" @mouseup="PassEye='password'"></i>
-            </el-input>
-        </el-form-item>	
-        <el-form-item label="新密码" prop="NewPassword">
-            <el-input :type="NewPassEye" v-model="user.NewPassword" auto-complete="off">          
-                <i slot="suffix" class="el-icon-view" @mousedown="NewPassEye= ''" @mouseup="NewPassEye='password'"></i>
-            </el-input>
-        </el-form-item>	
-        <el-form-item>
-            <el-button type="primary" @click="submitForm()" :loading="loading">立即保存</el-button>
+          <el-input :type="PassEye" v-model="user.Password" auto-complete="off">
+            <i
+              slot="suffix"
+              class="el-icon-view"
+              @mousedown="PassEye= ''"
+              @mouseup="PassEye='password'"
+            ></i>
+          </el-input>
         </el-form-item>
-    </el-form>
+        <el-form-item label="新密码" prop="NewPassword">
+          <el-input :type="NewPassEye" v-model="user.NewPassword" auto-complete="off">
+            <i
+              slot="suffix"
+              class="el-icon-view"
+              @mousedown="NewPassEye= ''"
+              @mouseup="NewPassEye='password'"
+            ></i>
+          </el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm()" :loading="loading">立即保存</el-button>
+        </el-form-item>
+      </el-form>
     </el-tab-pane>
   </el-tabs>
 </template>
 <script>
 export default {
-    name: 'ModifyPassword',
-    data: function () {
-        return {
-            loading: false,
-            user: {
-                UserNo: '',
-                Password: '',
-                NewPassword: ''
-            },
-            rules: {  		
-                Password: [
-                    { required: true, message: '请输入原密码', trigger: 'blur' }
-                ],		
-                NewPassword: [
-                    { required: true, message: '请输入新密码', trigger: 'blur' }
-                ]
-            },
-            PassEye: 'password',
-            NewPassEye: 'password'
-        }
-    },
-    methods: {
-        submitForm: function () {
-            this.$refs['editForm'].validate((valid) => {
-				if (valid) {
-					this.$confirm('确认提交吗？', '提示', {}).then(() => {
-                        this.loading = true
-                         this.getPublicKey((publickey) => {
-                            var encrypt = new JSEncrypt();
-                            encrypt.setPublicKey(publickey);
+  name: "ModifyPassword",
+  data: function() {
+    return {
+      loading: false,
+      user: {
+        UserNo: "",
+        Password: "",
+        NewPassword: ""
+      },
+      rules: {
+        Password: [
+          { required: true, message: "请输入原密码", trigger: "blur" }
+        ],
+        NewPassword: [
+          { required: true, message: "请输入新密码", trigger: "blur" }
+        ]
+      },
+      PassEye: "password",
+      NewPassEye: "password"
+    };
+  },
+  methods: {
+    submitForm: function() {
+      this.$refs["editForm"].validate(valid => {
+        if (valid) {
+          this.$confirm("确认提交吗？", "提示", {}).then(() => {
+            this.loading = true;
+            this.getPublicKey(publickey => {
+              var encrypt = new JSEncrypt();
+              encrypt.setPublicKey(publickey);
 
-                            var data = {
-                                UserNo: this.user.UserNo,
-                                Password: encrypt.encrypt(this.user.Password),
-                                NewPassword: encrypt.encrypt(this.user.NewPassword)
-                            };
-                            this.$http.post('/api/login/modifypassword', data).then((res) => {
-                                this.loading = false
-                                if (res.data.Type == 'Error') {
-                                    this.$message({
-                                        message: res.data.Result,
-                                        type: 'error',
-                                        duration: 0,
-                                        showClose: true
-                                    })
-                                }
-                                else {
-                                    this.$message({
-                                        message: '保存成功',
-                                        type: 'success'
-                                    })
-                                }
-							}).catch((error) => {
-								this.loading = false
-								this.$message({
-                                    message: error.message,
-                                    type: 'error',
-                                    duration: 0,
-                                    showClose: true
-                                })
-							});
-                        });						
-					})
-				}
-			})
-        },
-        getPublicKey: function (callback) {
-            this.$http.get('/api/login/getpublickey').then(res => {
-                if(callback)
-                    callback(res.data)
-            }).catch(error => {  
-                this.$message({
+              var data = {
+                UserNo: this.user.UserNo,
+                Password: encrypt.encrypt(this.user.Password),
+                NewPassword: encrypt.encrypt(this.user.NewPassword)
+              };
+              this.$http
+                .post("/api/login/modifypassword", data)
+                .then(res => {
+                  this.loading = false;
+                  if (res.data.Type == "Error") {
+                    this.$message({
+                      message: res.data.Result,
+                      type: "error",
+                      duration: 0,
+                      showClose: true
+                    });
+                  } else {
+                    this.$message({
+                      message: "保存成功",
+                      type: "success"
+                    });
+                  }
+                })
+                .catch(error => {
+                  this.loading = false;
+                  this.$message({
                     message: error.message,
-                    type: 'error'
-                    })       
-            })
+                    type: "error",
+                    duration: 0,
+                    showClose: true
+                  });
+                });
+            });
+          });
         }
+      });
     },
-    mounted: function () {
-        alert(localStorage.UserName);
-        this.user.UserNo = localStorage.UserName;        
+    getPublicKey: function(callback) {
+      this.$http
+        .get("/api/login/getpublickey")
+        .then(res => {
+          if (callback) callback(res.data);
+        })
+        .catch(error => {
+          this.$message({
+            message: error.message,
+            type: "error"
+          });
+        });
     }
-}
+  },
+  mounted: function() {
+    this.user.UserNo = localStorage.UserName;
+  }
+};
 </script>

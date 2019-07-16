@@ -3,7 +3,7 @@
     <el-col :span="24" class="toolbar">
       <el-form :inline="true" :model="filter">
         <el-form-item>
-          <el-input v-model="filter.name" placeholder="产品名称"></el-input>
+          <el-input v-model="filter.name" placeholder="按产品名称查询"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button
@@ -14,7 +14,7 @@
           >查询</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" icon="el-icon-edit" @click="addItem">新增</el-button>
+          <el-button type="primary" icon="el-icon-edit" @click="addItem" :loading="item.loading">新增</el-button>
         </el-form-item>
       </el-form>
     </el-col>
@@ -61,7 +61,12 @@
       ></el-pagination>
     </el-col>
 
-    <el-dialog title="新增产品" :visible.sync="item.visible" :close-on-click-modal="false" width="60%">
+    <el-dialog
+      :title="item.title"
+      :visible.sync="item.visible"
+      :close-on-click-modal="false"
+      width="60%"
+    >
       <el-form :model="item.data" :rules="item.rules" ref="form">
         <el-form-item label="产品名称" prop="name" label-width="100px">
           <el-input v-model="item.data.name" auto-complete="off"></el-input>
@@ -163,10 +168,10 @@ export default {
       },
       table: {
         list: [],
-        multipleSelection: [],
         loading: false
       },
       item: {
+        title: "新增产品信息",
         visible: false,
         loading: false,
         rules: {
@@ -210,6 +215,9 @@ export default {
           if (rep.data) {
             this.table.list = rep.data.Result;
             this.page.total = rep.data.TotalCount;
+          } else {
+            this.table.list = [];
+            this.page.total = 0;
           }
         })
         .catch(err => {
@@ -221,27 +229,27 @@ export default {
       this.query();
     },
     deleteItem: function(row) {
-      this.$confirm("确认是否要删除该记录吗？", "提示", { type: "warning" })
-        .then(() => {
-          this.table.loading = true;
-          this.$http
-            .delete("/api/goods/" + row.id)
-            .then(() => {
-              this.table.loading = false;
-              this.$message("删除成功");
-              this.search();
-            })
-            .catch(error => {
-              this.table.loading = false;
-              this.$message({
-                message: error.message,
-                type: "error",
-                duration: 0,
-                showClose: true
-              });
+      this.$confirm("确认是否要删除该记录吗？", "提示", {
+        type: "warning"
+      }).then(() => {
+        this.table.loading = true;
+        this.$http
+          .delete("/api/goods/" + row.id)
+          .then(() => {
+            this.table.loading = false;
+            this.$message("删除成功");
+            this.search();
+          })
+          .catch(error => {
+            this.table.loading = false;
+            this.$message({
+              message: error.message,
+              type: "error",
+              duration: 0,
+              showClose: true
             });
-        })
-        .catch(() => {});
+          });
+      });
     },
     editItem: function(row) {
       this.table.loading = true;
@@ -250,6 +258,7 @@ export default {
         .then(res => {
           if (res.data.Type == "Success") {
             this.table.loading = false;
+            this.item.title = "修改产品信息";
             this.item.visible = true;
             this.item.data = res.data.Result;
           } else {
@@ -273,7 +282,9 @@ export default {
         });
     },
     addItem: function() {
+      this.item.loading = true;
       this.item.visible = true;
+      this.item.title = "新增产品信息";
       this.item.data = {
         id: 0,
         name: "",
@@ -284,15 +295,18 @@ export default {
         attrs: [],
         downloads: []
       };
+      this.item.loading = false;
     },
     saveItem: function() {
+      console.log(item.data);
       this.item.loading = true;
       this.$http
         .post("api/goods", this.item.data)
         .then(res => {
-          this.$message({ message: "提交成功", type: "success" });
+          this.$message({ message: "保存成功", type: "success" });
           this.$refs["form"].resetFields();
-          this.item.loading = false;
+          this.item.visible = false;
+          this.item.loading = false;          
           this.query();
         })
         .catch(error => {
