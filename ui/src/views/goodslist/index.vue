@@ -74,7 +74,7 @@
         <el-form-item label="图片" prop="picture" label-width="100px">
           <el-upload
             class="avatar-uploader"
-            :action="updateURL"
+            :action="uploadURL"
             :show-file-list="false"
             :on-success="onAvatarSuccess"
             :before-upload="beforeAvatarUpload"
@@ -132,7 +132,7 @@
           <el-tab-pane label="附件清单" name="dowload">
             <el-upload
               class="upload-demo"
-              :action="updateURL"
+              :action="uploadURL"
               multiple
               :on-success="onFileSuccess"
               :before-upload="beforeFileUpload"
@@ -306,7 +306,7 @@ export default {
           this.$message({ message: "保存成功", type: "success" });
           this.$refs["form"].resetFields();
           this.item.visible = false;
-          this.item.loading = false;          
+          this.item.loading = false;
           this.query();
         })
         .catch(error => {
@@ -320,7 +320,6 @@ export default {
         });
     },
     onAvatarSuccess(res, file) {
-      console.log(file);
       this.item.data.picture = URL.createObjectURL(file.raw);
     },
     beforeAvatarUpload(file) {
@@ -350,7 +349,10 @@ export default {
     editor() {
       return this.$refs.myQuillEditor.quillEditor;
     },
-    updateURL() {
+    serverURL() {
+      return process.env.BASE_URL + "/";
+    },
+    uploadURL() {
       return process.env.BASE_URL + "/api/uploadfile";
     }
   },

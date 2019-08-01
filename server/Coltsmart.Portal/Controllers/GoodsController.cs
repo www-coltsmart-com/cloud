@@ -70,46 +70,42 @@ namespace Coltsmart.Portal.Controllers
         [Route("api/uploadfile")]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
+            //有效判断
             if (file == null || file.Length <= 0) return BadRequest();
+            string fileName = file.FileName;
+            string fileExt = Path.GetExtension(file.FileName);
+            long fileSize = file.Length;
 
             try
             {
-                string filePath = Path.GetTempFileName();
+                string rootPath = hostingEnvironment.WebRootPath ?? hostingEnvironment.ContentRootPath;//根目录
+                string uploadPath = Path.Combine("upload", "temp", DateTime.Today.ToString("yyyyMMdd"));//上传目录
+                string newFileName = Guid.NewGuid().ToString() + fileExt;//新文件名称，唯一标识
+
+                //上传目录
+                string path = Path.Combine(rootPath, uploadPath);
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                //删除过期文件及目录
+                string oldPath = Path.Combine(rootPath, "upload", "temp", DateTime.Today.AddDays(-15).ToString("yyyyMMdd"));
+                if (Directory.Exists(oldPath))
+                {
+                    Directory.Delete(oldPath);
+                }
+                //上传文件
+                string filePath = Path.Combine(path, newFileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
                 }
                 return Ok(new
                 {
-                    name = file.FileName,
-                    ext = Path.GetExtension(file.FileName),
-                    size = file.Length,
-                    path = filePath
-                });
-            }
-            catch (IOException ex)
-            {
-                //删除一些过期的临时文件
-                string tempPath = Path.GetTempPath();
-                foreach (var f in Directory.GetFiles(tempPath))
-                {
-                    if (File.GetCreationTime(f).AddHours(1) < DateTime.Now)
-                    {
-                        File.Delete(f);
-                    }
-                }
-                //再上传一遍
-                string filePath = Path.GetTempFileName();
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-                return Ok(new
-                {
-                    name = file.FileName,
-                    ext = Path.GetExtension(file.FileName),
-                    size = file.Length,
-                    path = filePath
+                    name = fileName,
+                    ext = fileExt,
+                    size = fileSize,
+                    path = Path.Combine(uploadPath, newFileName)
                 });
             }
             catch (Exception ex)

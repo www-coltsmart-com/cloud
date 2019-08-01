@@ -36,12 +36,12 @@ namespace coltsmart.server
         {
             services.AddCors(options =>
             {
-                options.AddPolicy("Policy",b =>
-                {
-                    b.WithOrigins("*");
-                    b.WithHeaders("*");
-                    b.WithMethods("*");
-                });
+                options.AddPolicy("Policy", b =>
+                 {
+                     b.WithOrigins("*");
+                     b.WithHeaders("*");
+                     b.WithMethods("*");
+                 });
             });
             services.AddMemoryCache();
             services.AddMvc(options => options.Conventions.Add(new WebApiOverloadingApplicationModelConvention()))
@@ -60,18 +60,18 @@ namespace coltsmart.server
             services.AddColtSmartMQTT(Configuration);
 
             ConfigurationVariables.Default = Configuration.BuildConfigurationVariables();
-            
+
             var builder = new ContainerBuilder();
             builder.Populate(services);
-            
+
             builder.RegisterDbExecutor(b => b.UsePostgre().UseConnectionString(ConfigurationVariables.Default.ConnectionString));
             builder.RegisterAssemblyTypes(typeof(UserService).Assembly).AsImplementedInterfaces();
             builder.RegisterAssemblyTypes(typeof(DeviceService).Assembly).AsImplementedInterfaces();
 
             this.ApplicationContainer = builder.Build();
-            
+
             return new AutofacServiceProvider(this.ApplicationContainer);
-            
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -97,7 +97,7 @@ namespace coltsmart.server
             app.UseStaticFiles();
             app.UseMvcWithDefaultRoute();
             app.UseColtSmartMQTT();
-            
+
             app.Run(async (context) =>
             {
                 await context.Response.WriteAsync(System.Diagnostics.Process.GetCurrentProcess().ProcessName);
