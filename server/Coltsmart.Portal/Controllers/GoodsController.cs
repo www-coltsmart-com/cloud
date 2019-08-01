@@ -70,36 +70,52 @@ namespace Coltsmart.Portal.Controllers
         [Route("api/uploadfile")]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
-            string tempPath = hostingEnvironment.WebRootPath + @"\upload\temp\";
-            //删除历史缓存图片
-            string oldPath = tempPath + @"\" + DateTime.Today.AddDays(-7).ToString("yyyyMMdd");
-            if (Directory.Exists(oldPath))
+            if (file == null || file.Length <= 0) return BadRequest();
+
+            try
             {
-                Directory.Delete(oldPath);
-            }
-            //新建缓存文件夹
-            string newPath = tempPath + @"\" + DateTime.Today.ToString("yyyyMMdd");
-            if (!Directory.Exists(newPath))
-            {
-                Directory.CreateDirectory(newPath);
-            }
-            //重新命名，防止重复
-            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-            string filePath = newPath + @"\" + fileName;
-            if (file.Length > 0)
-            {
+                string filePath = Path.GetTempFileName();
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
                 }
+                return Ok(new
+                {
+                    name = file.FileName,
+                    ext = Path.GetExtension(file.FileName),
+                    size = file.Length,
+                    path = filePath
+                });
             }
-            return Ok(new
+            catch (IOException ex)
             {
-                name = file.FileName,
-                ext = Path.GetExtension(file.FileName),
-                size = file.Length,
-                path = filePath
-            });
+                //删除一些过期的临时文件
+                string tempPath = Path.GetTempPath();
+                foreach (var f in Directory.GetFiles(tempPath))
+                {
+                    if (File.GetCreationTime(f).AddHours(1) < DateTime.Now)
+                    {
+                        File.Delete(f);
+                    }
+                }
+                //再上传一遍
+                string filePath = Path.GetTempFileName();
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                return Ok(new
+                {
+                    name = file.FileName,
+                    ext = Path.GetExtension(file.FileName),
+                    size = file.Length,
+                    path = filePath
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]

@@ -52,7 +52,7 @@
 
     <el-col :span="24" class="pagination">
       <el-pagination
-        background="true"
+        background
         layout="total, prev, pager, next, jumper, slot"
         @current-change="page_change"
         :current-page.sync="page.index"
@@ -298,7 +298,7 @@ export default {
       this.item.loading = false;
     },
     saveItem: function() {
-      console.log(item.data);
+      console.log(this.item.data);
       this.item.loading = true;
       this.$http
         .post("api/goods", this.item.data)
@@ -320,19 +320,16 @@ export default {
         });
     },
     onAvatarSuccess(res, file) {
+      console.log(file);
       this.item.data.picture = URL.createObjectURL(file.raw);
     },
     beforeAvatarUpload(file) {
-      const isJPG = file.type === "image/jpeg";
-      const isLt2M = file.size / 1024 / 1024 < 4;
+      const isLt2M = file.size / 1024 / 1024 < 10;
 
-      if (!isJPG) {
-        this.$message.error("上传图片只能是 JPG 格式!");
-      }
       if (!isLt2M) {
-        this.$message.error("上传图片大小不能超过 4MB!");
+        this.$message.error("上传图片大小不能超过 10MB!");
       }
-      return isJPG && isLt2M;
+      return isLt2M;
     },
     onFileSuccess(response, file, fileList) {
       file.url = URL.createObjectURL(file.raw);
