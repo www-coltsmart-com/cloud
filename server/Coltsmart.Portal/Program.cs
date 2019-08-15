@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using System.IO;
 using System.Text;
 
 namespace coltsmart.server
@@ -18,6 +19,7 @@ namespace coltsmart.server
                    {
                        o.ListenAnyIP(5000);
                    })
-                .UseStartup<Startup>();
+                   .UseContentRoot(Directory.GetCurrentDirectory())
+                   .UseStartup<Startup>();
     }
 }
