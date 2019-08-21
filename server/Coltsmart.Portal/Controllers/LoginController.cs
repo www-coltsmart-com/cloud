@@ -189,7 +189,7 @@ namespace coltsmart.server.Controllers
         {
             if (string.IsNullOrEmpty(email))
             {
-                return new ErrorResult<string>("邮箱不能为空");
+                return new ErrorResult<int>(1001);
             }
 
             //生成6为随机验证码
@@ -203,9 +203,10 @@ namespace coltsmart.server.Controllers
             string defaultSubject = "【鸣驹智能】邮箱注册验证码";
             string defaultBody = "欢迎您注册鸣驹智能，您的注册码为{code}";
 
+            //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             MailMessage message = new MailMessage(defaultEmail, email);
-            message.Subject = defaultSubject;
-            message.SubjectEncoding = Encoding.UTF8;
+            message.Subject = defaultSubject;            
             message.Body = defaultBody.Replace("{code}", verifyCode);
 
             //发送邮件
@@ -217,7 +218,7 @@ namespace coltsmart.server.Controllers
 
             //缓存验证码到内存中，以备注册时进行校验
             cache.Set<string>(email, verifyCode);
-            return new BaseResult<string>("发送成功，请注意查收");
+            return new BaseResult<int>(0);
         }
 
         //生成6位数字和大写字母的验证码

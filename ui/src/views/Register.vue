@@ -2,7 +2,7 @@
   <div class="login">
     <el-row>
       <el-col class="login-logo" :offset="1" :span="2">
-        <img src="../assets/logo.png" width="200">
+        <img src="../assets/logo.png" width="200" />
       </el-col>
     </el-row>
 
@@ -102,7 +102,7 @@
                 :loading="loading"
                 style="width:100%"
               >立即注册</el-button>
-              <hr>
+              <hr />
               <p>
                 已有账号，直接去
                 <el-link type="primary" @click="redirect">登录</el-link>吧
@@ -220,10 +220,22 @@ export default {
       this.$http
         .get("/api/login/sendverifycode?email=" + email)
         .then(res => {
-          this.$message({
-            message: res.data.Result,
-            type: res.data.Type == "Error" ? "error" : "success"
-          });
+          if (res.data.Type == "Success") {
+            this.$message({
+              message: "发送成功，请注意查收",
+              type: "success"
+            });
+          } else if (res.data.Result == 1001) {
+            this.$message({
+              message: "邮箱不能为空",
+              type: "error"
+            });
+          } else {
+            this.$message({
+              message: "发送失败，请重新发送",
+              type: "error"
+            });
+          }
         })
         .catch(error => {
           this.$message({
