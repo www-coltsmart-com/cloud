@@ -70,7 +70,6 @@ namespace coltsmart.server.Controllers
                     Company = user.Company,
                     RegDate = user.RegDate,
                     IsDefaultPassword = user.Password.Equals(EncryptHelper.Instance.PassEncryption(user.UserNo, "654321"))
-                    //IsDefaultPassword = false
                 };
             }
             else
@@ -100,7 +99,7 @@ namespace coltsmart.server.Controllers
                 return new ErrorResult<string>("当前用户无效");
             }
             string key = string.Format("{0}_STATS_INFO", userNo);
-             if (cache.Get(key) == null)
+            if (cache.Get(key) == null)
             {
                 var user = userService.GetUser(userNo);
                 if (user == null)
@@ -108,7 +107,7 @@ namespace coltsmart.server.Controllers
                     return new ErrorResult<string>("当前用户无效");
                 }
                 bool isAdmin = user.UserType == EUserType.Admin;//判断是否为管理员身份，用于显示不同权限的统计数据
-                int totalDeviceCount = await deviceService.GetDeviceCount((isAdmin ? "": user.UserNo));
+                int totalDeviceCount = await deviceService.GetDeviceCount((isAdmin ? "" : user.UserNo));
                 int onlineDeviceCount = await deviceService.GetDeviceCount((isAdmin ? "" : user.UserNo), true);
                 int totalUserCount = await userService.GetUserCount();
                 var value = new StatsInfo()
@@ -195,26 +194,32 @@ namespace coltsmart.server.Controllers
             //生成6为随机验证码
             string verifyCode = CreateVerifyCode(6);
 
-            //TODO:维护发送验证码的邮箱信息
-            string defaultEmail = "jim-lung@163.com";
-            string authCode = "1qaz2wsx";
-            string defaultHost = "smtp.163.com";
-            int defaultPort = 25;
-            string defaultSubject = "【鸣驹智能】邮箱注册验证码";
-            string defaultBody = "欢迎您注册鸣驹智能，您的注册码为{code}";
+            try
+            {
+                //TODO:维护发送验证码的邮箱信息
+                string defaultEmail = "jim-lung@163.com";
+                string authCode = "1qaz2wsx";
+                string defaultHost = "smtp.163.com";
+                int defaultPort = 25;
+                string defaultSubject = "【鸣驹智能】邮箱注册验证码";
+                string defaultBody = "你好，欢迎你注册鸣驹智能平台，您的注册码为{code}，请及时进行验证。";
 
-            //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            MailMessage message = new MailMessage(defaultEmail, email);
-            message.Subject = defaultSubject;            
-            message.Body = defaultBody.Replace("{code}", verifyCode);
+                MailMessage message = new MailMessage(defaultEmail, email);
+                message.Subject = defaultSubject;
+                message.Body = defaultBody.Replace("{code}", verifyCode);
 
-            //发送邮件
-            SmtpClient client = new SmtpClient(defaultHost, defaultPort);
-            client.EnableSsl = true;
-            client.UseDefaultCredentials = false;
-            client.Credentials = new NetworkCredential(defaultEmail, authCode);
-            client.Send(message);
+                //发送邮件
+                SmtpClient client = new SmtpClient(defaultHost, defaultPort);
+                client.EnableSsl = true;
+                client.Credentials = new NetworkCredential(defaultEmail, authCode);
+                client.Send(message);
+            }
+            catch
+            {
+                return new ErrorResult<int>(9999);
+            }
 
             //缓存验证码到内存中，以备注册时进行校验
             cache.Set<string>(email, verifyCode);
