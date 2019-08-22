@@ -9,7 +9,7 @@ namespace ColtSmart.Service.Service
 
         Task<IResult> ModifyPassword(TUser user);
 
-        Task<IResult> ResetPassword(TUser user);
+        Task<bool> ResetPassword(TUser user);
 
         TUser GetUser(string userno);
 

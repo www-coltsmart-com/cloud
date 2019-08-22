@@ -184,11 +184,11 @@ namespace coltsmart.server.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("/api/login/sendverifycode")]
-        public IResult SendVerifyCode(string email)
+        public IActionResult SendVerifyCode(string email)
         {
             if (string.IsNullOrEmpty(email))
             {
-                return new ErrorResult<int>(1001);
+                return StatusCode(HttpStatusCode.BadRequest);
             }
 
             //生成6为随机验证码
@@ -196,15 +196,13 @@ namespace coltsmart.server.Controllers
 
             try
             {
-                //TODO:维护发送验证码的邮箱信息
+                //TODO:在数据库表中维护系统邮箱账号等信息  dxj
                 string defaultEmail = "jim-lung@163.com";
                 string authCode = "1qaz2wsx";
                 string defaultHost = "smtp.163.com";
                 int defaultPort = 25;
                 string defaultSubject = "【鸣驹智能】邮箱注册验证码";
                 string defaultBody = "你好，欢迎你注册鸣驹智能平台，您的注册码为{code}，请及时进行验证。";
-
-                //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
                 MailMessage message = new MailMessage(defaultEmail, email);
                 message.Subject = defaultSubject;
@@ -215,15 +213,15 @@ namespace coltsmart.server.Controllers
                 client.EnableSsl = true;
                 client.Credentials = new NetworkCredential(defaultEmail, authCode);
                 client.Send(message);
+
+                //缓存验证码到内存中，以备注册时进行校验
+                cache.Set<string>(email, verifyCode);
+                return Ok();
             }
             catch
             {
-                return new ErrorResult<int>(9999);
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
-
-            //缓存验证码到内存中，以备注册时进行校验
-            cache.Set<string>(email, verifyCode);
-            return new BaseResult<int>(0);
         }
 
         //生成6位数字和大写字母的验证码
@@ -264,30 +262,19 @@ namespace coltsmart.server.Controllers
 
         [HttpPost]
         [Route("api/Login/resetpassword")]
-        public async Task<IResult> ResetPassword([FromBody]TUser user)
+        public async Task<IActionResult> ResetPassword([FromBody]TUser user)
         {
-            if (user == null || string.IsNullOrEmpty(user.RegEmall))
+            if (user == null || string.IsNullOrEmpty(user.RegEmall) || string.IsNullOrEmpty(user.UserName) || string.IsNullOrEmpty(user.NewPassword))
             {
-                return new ErrorResult<string>("注册信息无效");
-            }
-            if (string.IsNullOrEmpty(user.UserName))
-            {
-                return new ErrorResult<string>("用户名不能为空");
-            }
-            if (string.IsNullOrEmpty(user.NewPassword))
-            {
-                return new ErrorResult<string>("验证码不能为空");
+                return StatusCode(HttpStatusCode.BadRequest);
             }
             string verifyCode = "";
-            if (!cache.TryGetValue(user.RegEmall, out verifyCode) || string.IsNullOrEmpty(verifyCode))
+            if (!cache.TryGetValue(user.RegEmall, out verifyCode) || string.IsNullOrEmpty(verifyCode) || 0 != user.NewPassword.Trim().CompareTo(verifyCode))
             {
-                return new ErrorResult<string>("验证码无效，请重新获取新的验证码");
+                return StatusCode(HttpStatusCode.Unauthorized);
             }
-            if (0 != user.NewPassword.Trim().CompareTo(verifyCode))
-            {
-                return new ErrorResult<string>("验证码不正确，请重新填写");
-            }
-            return await userService.ResetPassword(user);
+            bool result = await userService.ResetPassword(user);
+            return result ? Ok() : StatusCode(HttpStatusCode.BadRequest);
         }
 
     }

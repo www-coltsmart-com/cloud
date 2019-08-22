@@ -36,19 +36,15 @@ namespace ColtSmart.Service.Impl
             return new BaseResult<int>(result);
         }
 
-        public async Task<IResult> ResetPassword(TUser user)
+        public async Task<bool> ResetPassword(TUser user)
         {
-            if (user == null || string.IsNullOrEmpty(user.RegEmall))
-            {
-                return new ErrorResult<string>("邮箱不能为空");
-            }
+            if (user == null || string.IsNullOrEmpty(user.RegEmall)) return false;
             var users = await sqlExecutor.FindAsync<TUser>(new { UserNo = user.UserName, RegEmall = user.RegEmall });
             var retUser = users.FirstOrDefault();
-            if (retUser == null)
-                return new ErrorResult<string>("邮箱或用户名不正确");
+            if (retUser == null) return false;
             retUser.Password = retUser.NewPassword = EncryptHelper.Instance.PassEncryption(retUser.UserNo, "654321");
             var result = await sqlExecutor.UpdateAsync<TUser>(retUser);
-            return new BaseResult<int>(result);
+            return result > 0;
         }
 
         public bool VerifyUser(string usercode, string password)
