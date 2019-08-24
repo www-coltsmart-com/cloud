@@ -92,7 +92,7 @@
             type="text"
             v-model="ResetPassword.data.uname"
             auto-complete="off"
-            placeholder="请输入用户名"
+            placeholder="您的用户名"
           ></el-input>
         </el-form-item>
         <el-form-item label="电子邮箱" prop="email">
@@ -100,7 +100,7 @@
             type="text"
             v-model="ResetPassword.data.email"
             auto-complete="off"
-            placeholder="需要通过邮箱接收验证码"
+            placeholder="您注册时所使用的邮箱"
           >
             <el-button
               v-if="ResetPassword.enble_verify_code==0"
