@@ -19,20 +19,20 @@ namespace ColtSmart.Service
         /// <returns>设备列表</returns>
         Task<PagedResult<Device>> GetDevices(int page, int pageSize, string userNo, string deviceId, string deviceName);
 
-        Task Update(Device device);
+        Task<bool> Update(Device device);
 
-        Task Insert(Device device);
+        Task<bool> Insert(Device device);
 
         /// <summary>
         /// 删除设备
         /// </summary>
         /// <param name="id">设备唯一标识</param>
         /// <returns>影响行数</returns>
-        Task<int> Delete(int id);
+        Task<bool> Delete(int id);
 
-        Task UpdateOnline(string deviceId, bool isOnline);
+        Task<bool> UpdateOnline(string deviceId, bool isOnline);
 
-        Task UpdateDeviceNet(string deviceId, double netFlow);
+        Task<bool> UpdateDeviceNet(string deviceId, double netFlow);
 
         Task<int> GetDeviceCount(string userNo, bool isOnline = false);
     }

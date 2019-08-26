@@ -7,7 +7,7 @@ namespace ColtSmart.Service.Service
     {
         bool VerifyUser(string username, string password);
 
-        Task<IResult> ModifyPassword(TUser user);
+        Task<bool> ModifyPassword(TUser user);
 
         Task<bool> ResetPassword(TUser user);
 
@@ -15,11 +15,11 @@ namespace ColtSmart.Service.Service
 
         Task<PagedResult<TUser>> GetUsers(int page, int pageSize, string userName);
 
-        Task<int> Delete(int id);
+        Task<bool> Delete(int id);
 
-        Task<IResult> Create(TUser user);
+        Task<bool> Create(TUser user);
 
-        Task<IResult> Register(TUser user);
+        Task<bool> Register(TUser user);
 
         Task<int> GetUserCount();
     }

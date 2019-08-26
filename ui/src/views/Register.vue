@@ -73,14 +73,15 @@
                 auto-complete="off"
                 placeholder="需要通过邮箱接收验证码"
               >
+                <el-button v-if="enble_verify_code==0" slot="suffix" type="text" disabled>发送验证码</el-button>
                 <el-button
-                  v-if="enbleVerifyCode"
+                  v-if="enble_verify_code==1"
                   slot="suffix"
                   type="text"
                   @click="sendVerifyCode"
                 >发送验证码</el-button>
                 <el-button
-                  v-if="!enbleVerifyCode"
+                  v-if="enble_verify_code==2"
                   slot="suffix"
                   type="text"
                   disabled
@@ -107,7 +108,6 @@
                 已有账号，直接去
                 <el-link type="primary" @click="redirect">登录</el-link>吧
               </p>
-              <!-- <el-button type="primary" @click="redirect()" >登录</el-button> -->
             </el-form-item>
           </el-form>
         </el-card>
@@ -119,7 +119,7 @@
     <el-row type="flex" justify="center">
       <el-col :span="12">
         <div class="login-bottom">
-          <span>©&nbsp;2018 &nbsp;&nbsp; 上海市鸣驹智能科技有限公司 &nbsp;&nbsp; 技术支持</span>
+          <span>©&nbsp;2019 &nbsp;&nbsp; 上海市鸣驹智能科技有限公司 &nbsp;&nbsp; 技术支持</span>
         </div>
       </el-col>
     </el-row>
@@ -164,7 +164,7 @@ export default {
       PassEye: "password",
       PassEye2: "password",
       loading: false,
-      enbleVerifyCode: true,
+      enbleVerifyCode: 0,
       verify_time: 60,
       RegisterUser: {
         UserNo: "",
@@ -216,42 +216,43 @@ export default {
         });
         return;
       }
-      this.enbleVerifyCode = false;
+      this.enbleVerifyCode = 2;
       this.$http
         .get("/api/login/sendverifycode?email=" + email)
         .then(res => {
-          if (res.data.Type == "Success") {
-            this.$message({
-              message: "发送成功，请注意查收",
-              type: "success"
-            });
-          } else if (res.data.Result == 1001) {
+          this.$message({
+            message: "发送成功，请注意查收",
+            type: "success"
+          });
+          this.verify_time = 60;
+          var handle = setInterval(() => {
+            this.verify_time--;
+            if (this.verify_time <= 0) {
+              this.verify_time = 60;
+              this.enbleVerifyCode = 1;
+              clearInterval(handle);
+            }
+          }, 1000);
+        })
+        .catch(error => {
+          this.enble_verify_code = 1;
+          if (error.response.status == 400) {
             this.$message({
               message: "邮箱不能为空",
               type: "error"
             });
+          } else if (error.response.status == 500) {
+            this.$message({
+              message: "邮件发送失败，请尝试重新一次",
+              type: "error"
+            });
           } else {
             this.$message({
-              message: "发送失败，请重新发送",
+              message: error.message,
               type: "error"
             });
           }
-        })
-        .catch(error => {
-          this.$message({
-            message: err.message,
-            type: "error"
-          });
         });
-      this.verify_time = 60;
-      var handle = setInterval(() => {
-        this.verify_time--;
-        if (this.verify_time <= 0) {
-          this.verify_time = 60;
-          this.enbleVerifyCode = true;
-          clearInterval(handle);
-        }
-      }, 1000);
     },
     redirect: function() {
       this.$router.push("/login");
@@ -272,27 +273,37 @@ export default {
           .post("api/Login/savereg", user, { rsa: true })
           .then(res => {
             this.loading = false;
-            if (res.data.Type == "Error") {
+            this.$message({
+              message: "恭喜您注册成功，即将跳转到登录页!",
+              type: "success"
+            });
+            setTimeout(() => {
+              this.$router.push("/login");
+            }, 2000);
+          })
+          .catch(error => {
+            this.loading = false;
+            if (error.response.status == 400) {
               this.$message({
-                message: res.data.Result,
+                message: "邮箱不能为空",
+                type: "error"
+              });
+            } else if (error.response.status == 400) {
+              this.$message({
+                message: "验证码不能为空",
+                type: "error"
+              });
+            } else if (error.response.status == 500) {
+              this.$message({
+                message: "注册失败，请尝试重新一次",
                 type: "error"
               });
             } else {
               this.$message({
-                message: "恭喜您注册成功，即将跳转到登录页!",
-                type: "success"
+                message: error.message,
+                type: "error"
               });
-              setTimeout(() => {
-                this.$router.push("/login");
-              }, 2000);
             }
-          })
-          .catch(error => {
-            this.loading = false;
-            this.$message({
-              message: error.message,
-              type: "error"
-            });
           });
       });
     },
@@ -312,9 +323,7 @@ export default {
         });
     }
   },
-  mounted: function() {
-    //this.getPublicKey()
-  }
+  mounted: function() {}
 };
 </script>
 

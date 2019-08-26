@@ -28,14 +28,14 @@ namespace Coltsmart.Portal.Controllers
 
         [HttpDelete]
         [Route("api/users/{id}")]
-        public async Task<int> Delete(int id)
+        public async Task<bool> Delete(int id)
         {
             return await userService.Delete(id);
         }
 
         [HttpPost]
         [Route("api/users")]
-        public async Task<IResult> Create([FromBody]TUser user)
+        public async Task<bool> Create([FromBody]TUser user)
         {
             return await userService.Create(user);
         }

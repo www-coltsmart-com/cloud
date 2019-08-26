@@ -124,7 +124,7 @@ namespace ColtSmart.Encrypt
                 cryptoStream.Close();
                 result=this.ConvertFromByteArray(memoryStream.ToArray(), true);
             }
-			catch (Exception ex)
+			catch
 			{
 				result = "";
 			}
@@ -161,7 +161,7 @@ namespace ColtSmart.Encrypt
 				cryptoStream.Close();
 				result = this.ConvertFromByteArray(memoryStream.ToArray(), false);
 			}
-			catch (Exception ex)
+			catch
 			{
 				result = "";
 			}

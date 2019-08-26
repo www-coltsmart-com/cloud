@@ -14,10 +14,10 @@ namespace ColtSmart.Service.Service
 
         Task<IEnumerable<GoodsAttach>> GetGoodsAttachments(int goodsId);
 
-        Task<int> Insert(Goods goods, IEnumerable<GoodsAttr> attrs, IEnumerable<GoodsAttach> downloads);
+        Task<bool> Insert(Goods goods, IEnumerable<GoodsAttr> attrs, IEnumerable<GoodsAttach> downloads);
 
-        Task<int> Update(Goods goods, IEnumerable<GoodsAttr> attrs, IEnumerable<GoodsAttach> downloads);
+        Task<bool> Update(Goods goods, IEnumerable<GoodsAttr> attrs, IEnumerable<GoodsAttach> downloads);
 
-        Task<int> Delete(int id);
+        Task<bool> Delete(int id);
     }
 }

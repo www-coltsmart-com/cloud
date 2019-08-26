@@ -19,14 +19,12 @@ namespace ColtSmart.Service.Impl
         public async Task<Device> GetDevice(string deviceId)
         {
             var device = await this.sqlExecutor.FindAsync<Device>(new { DeviceId = deviceId });
-
             return device.FirstOrDefault();
         }
 
         public async Task<Device> GetDevice(string deviceId, string userNo)
         {
             var device = await this.sqlExecutor.FindAsync<Device>(new { DeviceId = deviceId, UserOwn = userNo });
-
             return device.FirstOrDefault();
         }
 
@@ -93,14 +91,14 @@ namespace ColtSmart.Service.Impl
             return results.ToPagedResult();
         }
 
-        public async Task Insert(Device device)
+        public async Task<bool> Insert(Device device)
         {
-            await this.sqlExecutor.InsertAsync<Device>(device);
+            return await this.sqlExecutor.InsertAsync<Device>(device) > 0;
         }
 
-        public async Task Update(Device device)
+        public async Task<bool> Update(Device device)
         {
-            await this.sqlExecutor.ExecuteAsync("update device set \"DeviceType\"=@DeviceType, \"IsGetway\" =@IsGetway, \"DeviceName\" =@DeviceName, \"IsOnline\" =@IsOnline, \"InDate\" =@InDate, \"UserOwn\" =@UserOwn, \"Gps\" =@Gps, \"Version\" =@Version, \"ComPortNum\" =@ComPortNum where \"DeviceId\"=@DeviceId", new
+            return await this.sqlExecutor.ExecuteAsync("update device set \"DeviceType\"=@DeviceType, \"IsGetway\" =@IsGetway, \"DeviceName\" =@DeviceName, \"IsOnline\" =@IsOnline, \"InDate\" =@InDate, \"UserOwn\" =@UserOwn, \"Gps\" =@Gps, \"Version\" =@Version, \"ComPortNum\" =@ComPortNum where \"DeviceId\"=@DeviceId", new
             {
                 #region
                 DeviceId = device.DeviceId,
@@ -114,7 +112,7 @@ namespace ColtSmart.Service.Impl
                 Version = device.Version,
                 ComPortNum = device.ComPortNum
                 #endregion
-            }, commandType: System.Data.CommandType.Text);
+            }, commandType: System.Data.CommandType.Text) > 0;
         }
 
         /// <summary>
@@ -122,33 +120,29 @@ namespace ColtSmart.Service.Impl
         /// </summary>
         /// <param name="id">设备唯一标识</param>
         /// <returns>影响行数</returns>
-        public async Task<int> Delete(int id)
+        public async Task<bool> Delete(int id)
         {
             var results = await this.sqlExecutor.FindAsync<Device>(new { Id = id });
-            var device = results.FirstOrDefault();
-            if (device != null)
-            {
-                return await this.sqlExecutor.DeleteAsync(device);
-            }
-            return 0;
+            if (results == null || !results.Any()) return false;
+            return await this.sqlExecutor.DeleteAsync(results.First()) > 0;
         }
 
-        public async Task UpdateOnline(string deviceId, bool isOnline)
+        public async Task<bool> UpdateOnline(string deviceId, bool isOnline)
         {
-            await this.sqlExecutor.ExecuteAsync("update device set \"IsOnline\" =@IsOnline where \"DeviceId\"=@DeviceId", new
+            return await this.sqlExecutor.ExecuteAsync("update device set \"IsOnline\" =@IsOnline where \"DeviceId\"=@DeviceId", new
             {
                 DeviceId = deviceId,
                 IsOnline = isOnline
-            }, System.Data.CommandType.Text);
+            }, System.Data.CommandType.Text) > 0;
         }
 
-        public async Task UpdateDeviceNet(string deviceId, double netFlow)
+        public async Task<bool> UpdateDeviceNet(string deviceId, double netFlow)
         {
-            await this.sqlExecutor.InsertAsync<DeviceNet>(new DeviceNet
+            return await this.sqlExecutor.InsertAsync<DeviceNet>(new DeviceNet
             {
                 DeviceId = deviceId,
                 NetFlow = netFlow
-            });
+            }) > 0;
         }
 
         public async Task<int> GetDeviceCount(string userNo, bool isOnline = false)

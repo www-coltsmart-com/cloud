@@ -52,7 +52,7 @@ namespace ColtSmart.Service.Impl
             return await sqlExecutor.FindAsync<GoodsAttach>(new { GoodsId = goodsId });
         }
 
-        public async Task<int> Insert(Goods goods, IEnumerable<GoodsAttr> attrs, IEnumerable<GoodsAttach> downloads)
+        public async Task<bool> Insert(Goods goods, IEnumerable<GoodsAttr> attrs, IEnumerable<GoodsAttach> downloads)
         {
             var trans = sqlExecutor.BeginTransaction();
             try
@@ -69,16 +69,16 @@ namespace ColtSmart.Service.Impl
                     await sqlExecutor.InsertAsync(attach, trans);
                 }
                 trans.Commit();
-                return id;
+                return true;
             }
-            catch (System.Exception ex)
+            catch
             {
                 trans.Rollback();
-                return -999999;
+                return false;
             }
         }
 
-        public async Task<int> Update(Goods goods, IEnumerable<GoodsAttr> attrs, IEnumerable<GoodsAttach> downloads)
+        public async Task<bool> Update(Goods goods, IEnumerable<GoodsAttr> attrs, IEnumerable<GoodsAttach> downloads)
         {
             var trans = sqlExecutor.BeginTransaction();
             try
@@ -108,16 +108,16 @@ namespace ColtSmart.Service.Impl
                 foreach (var attach in downloads) attach.GoodsId = goods.id;
                 await sqlExecutor.BulkInsertAsync<GoodsAttach>(downloads, trans);
                 trans.Commit();
-                return result;
+                return true;
             }
-            catch (System.Exception ex)
+            catch
             {
                 trans.Rollback();
-                return -999999;
+                return false;
             }
         }
 
-        public async Task<int> Delete(int id)
+        public async Task<bool> Delete(int id)
         {
             var trans = sqlExecutor.BeginTransaction();
             try
@@ -138,14 +138,13 @@ namespace ColtSmart.Service.Impl
                     await sqlExecutor.DeleteAsync(goods, trans);
                 }
                 trans.Commit();
-                return 0;
+                return true;
             }
-            catch (System.Exception ex)
+            catch
             {
-                return -999999;
+                trans.Rollback();
+                return false;
             }
-
-
         }
     }
 }

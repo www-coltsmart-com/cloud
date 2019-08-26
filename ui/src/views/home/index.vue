@@ -101,19 +101,13 @@ export default {
       this.$http
         .get("api/Login/getstatsinfo?userNo=" + user_no)
         .then(resp => {
-          if (resp.data.Type == "Error") {
-            throw new Error(resp.data.Result);
-          }
-          if (resp.data.Result == null) {
-            throw new Error("统计无效");
-          }
           this.stats = {
-            total_device_count: resp.data.Result.TotalDeviceCount,
-            total_device_display: resp.data.Result.TotalDeviceDisplay,
-            online_device_count: resp.data.Result.OnlineDeviceCount,
-            online_device_display: resp.data.Result.OnlineDeviceDisplay,
-            total_user_count: resp.data.Result.TotalUserCount,
-            total_user_display: resp.data.Result.TotalUserDisplay
+            total_device_count: resp.data.TotalDeviceCount,
+            total_device_display: resp.data.TotalDeviceDisplay,
+            online_device_count: resp.data.OnlineDeviceCount,
+            online_device_display: resp.data.OnlineDeviceDisplay,
+            total_user_count: resp.data.TotalUserCount,
+            total_user_display: resp.data.TotalUserDisplay
           };
         })
         .catch(error => {

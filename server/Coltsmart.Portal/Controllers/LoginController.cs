@@ -47,8 +47,10 @@ namespace coltsmart.server.Controllers
             {
                 return Ok<string>(JwtManager.GenerateToken(user.UserName));
             }
-
-            return StatusCode(System.Net.HttpStatusCode.Unauthorized);
+            else
+            {
+                return StatusCode(System.Net.HttpStatusCode.Unauthorized);
+            }
         }
 
         [HttpGet]
@@ -92,40 +94,34 @@ namespace coltsmart.server.Controllers
 
         [HttpGet]
         [Route("api/Login/getstatsinfo")]
-        public async Task<IResult> GetStatsInfo(string userNo)
+        public async Task<IActionResult> GetStatsInfo(string userNo)
         {
             if (string.IsNullOrEmpty(userNo))
             {
-                return new ErrorResult<string>("当前用户无效");
+                return StatusCode(HttpStatusCode.Unauthorized);
             }
             string key = string.Format("{0}_STATS_INFO", userNo);
-            if (cache.Get(key) == null)
+            if (cache.Get(key) != null)
             {
-                var user = userService.GetUser(userNo);
-                if (user == null)
-                {
-                    return new ErrorResult<string>("当前用户无效");
-                }
-                bool isAdmin = user.UserType == EUserType.Admin;//判断是否为管理员身份，用于显示不同权限的统计数据
-                int totalDeviceCount = await deviceService.GetDeviceCount((isAdmin ? "" : user.UserNo));
-                int onlineDeviceCount = await deviceService.GetDeviceCount((isAdmin ? "" : user.UserNo), true);
-                int totalUserCount = await userService.GetUserCount();
-                var value = new StatsInfo()
-                {
-                    TotalDeviceCount = totalDeviceCount,
-                    TotalDeviceDisplay = true,
-                    OnlineDeviceCount = onlineDeviceCount,
-                    OnlineDeviceDisplay = true,
-                    TotalUserCount = totalUserCount,
-                    TotalUserDisplay = isAdmin
-                };
-                cache.Set(key, value, new DateTimeOffset(DateTime.Now.AddMinutes(5)));
-                return new BaseResult<StatsInfo>(value);
+                return Ok<StatsInfo>(cache.Get(key) as StatsInfo);
             }
-            else
+            var user = userService.GetUser(userNo);
+            if (user == null) return StatusCode(HttpStatusCode.Unauthorized);
+            bool isAdmin = user.UserType == EUserType.Admin;//判断是否为管理员身份，用于显示不同权限的统计数据
+            int totalDeviceCount = await deviceService.GetDeviceCount((isAdmin ? "" : user.UserNo));
+            int onlineDeviceCount = await deviceService.GetDeviceCount((isAdmin ? "" : user.UserNo), true);
+            int totalUserCount = await userService.GetUserCount();
+            var value = new StatsInfo()
             {
-                return new BaseResult<StatsInfo>(cache.Get(key) as StatsInfo);
-            }
+                TotalDeviceCount = totalDeviceCount,
+                TotalDeviceDisplay = true,
+                OnlineDeviceCount = onlineDeviceCount,
+                OnlineDeviceDisplay = true,
+                TotalUserCount = totalUserCount,
+                TotalUserDisplay = isAdmin
+            };
+            cache.Set(key, value, new DateTimeOffset(DateTime.Now.AddMinutes(5)));
+            return Ok(value);
         }
 
         [HttpGet]
@@ -155,30 +151,23 @@ namespace coltsmart.server.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("api/Login/savereg")]
-        public async Task<IResult> Register([FromBody]TUser user)
+        public async Task<IActionResult> Register([FromBody]TUser user)
         {
             if (user == null || string.IsNullOrEmpty(user.RegEmall))
             {
-                return new ErrorResult<string>("注册信息无效");
-            }
-            if (string.IsNullOrEmpty(user.NewPassword))
-            {
-                return new ErrorResult<string>("验证码不能为空");
+                return StatusCode(HttpStatusCode.BadRequest);
             }
             string verifyCode = "";
-            if (!cache.TryGetValue(user.RegEmall, out verifyCode) || string.IsNullOrEmpty(verifyCode))
+            if (string.IsNullOrEmpty(user.NewPassword) || !cache.TryGetValue(user.RegEmall, out verifyCode) || string.IsNullOrEmpty(verifyCode) || 0 != user.NewPassword.Trim().CompareTo(verifyCode))
             {
-                return new ErrorResult<string>("验证码无效，请重新获取新的验证码");
-            }
-            if (0 != user.NewPassword.Trim().CompareTo(verifyCode))
-            {
-                return new ErrorResult<string>("验证码不正确，请重新填写");
+                return StatusCode(HttpStatusCode.Unauthorized);
             }
 
             Dictionary<string, string> keyPair = GetRSAKeyPair();
             //解密登录密码
             user.Password = EncryptionProvider.DecryptRSA(user.Password, keyPair["PRIVATE"]);
-            return await userService.Register(user);
+            var result = await userService.Register(user);
+            return result ? Ok() : StatusCode(HttpStatusCode.InternalServerError);
         }
 
         [HttpGet]
@@ -251,13 +240,17 @@ namespace coltsmart.server.Controllers
 
         [HttpPost]
         [Route("/api/login/modifypassword")]
-        public async Task<IResult> ModifyPassword([FromBody]TUser user)
+        public async Task<IActionResult> ModifyPassword([FromBody]TUser user)
         {
+            if (user == null || string.IsNullOrEmpty(user.Password) || string.IsNullOrEmpty(user.NewPassword))
+                return StatusCode(HttpStatusCode.BadRequest);
+
             Dictionary<string, string> keyPair = GetRSAKeyPair();
             user.Password = EncryptionProvider.DecryptRSA(user.Password, keyPair["PRIVATE"]);
             user.NewPassword = EncryptionProvider.DecryptRSA(user.NewPassword, keyPair["PRIVATE"]);
 
-            return await userService.ModifyPassword(user);
+            var result = await userService.ModifyPassword(user);
+            return result ? Ok() : StatusCode(HttpStatusCode.InternalServerError);
         }
 
         [HttpPost]

@@ -37,32 +37,27 @@ namespace Coltsmart.Portal.Controllers
         //获取单条记录
         [HttpGet]
         [Route("api/goods/{id}")]
-        public async Task<IResult> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            try
-            {
-                if (id <= 0) throw new System.Exception("参数无效");
-                var goods = await goodsService.GetGoods(id);
-                if (goods == null) throw new System.Exception("产品信息不存在");
-                var attrs = await goodsService.GetGoodsAttributes(id);
-                var downloads = await goodsService.GetGoodsAttachments(id);
-                var result = goods.ToModel();
-                result.attrs = attrs.ToModel();
-                result.downloads = downloads.ToModel();
-                return new BaseResult<GoodsModel>(result);
-            }
-            catch (System.Exception ex)
-            {
-                return new ErrorResult<string>(ex.Message);
-            }
+            if (id <= 0) return BadRequest();
+            var goods = await goodsService.GetGoods(id);
+            if (goods == null) return BadRequest();
+
+            var attrs = await goodsService.GetGoodsAttributes(id);
+            var downloads = await goodsService.GetGoodsAttachments(id);
+            var result = goods.ToModel();
+            result.attrs = attrs.ToModel();
+            result.downloads = downloads.ToModel();
+            return Ok(result);
         }
 
         //删除
         [HttpDelete]
         [Route("api/goods/{id}")]
-        public async Task<int> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            return await goodsService.Delete(id);
+            await goodsService.Delete(id);
+            return Ok();
         }
 
         //上传图片
@@ -78,7 +73,7 @@ namespace Coltsmart.Portal.Controllers
 
             try
             {
-                string rootPath = hostingEnvironment.WebRootPath ?? hostingEnvironment.ContentRootPath;//根目录
+                string rootPath = hostingEnvironment.ContentRootPath;//根目录
                 string uploadPath = Path.Combine("upload", "temp", DateTime.Today.ToString("yyyyMMdd"));//上传目录
                 string newFileName = Guid.NewGuid().ToString() + fileExt;//新文件名称，唯一标识
 
@@ -92,7 +87,7 @@ namespace Coltsmart.Portal.Controllers
                 string oldPath = Path.Combine(rootPath, "upload", "temp", DateTime.Today.AddDays(-15).ToString("yyyyMMdd"));
                 if (Directory.Exists(oldPath))
                 {
-                    Directory.Delete(oldPath);
+                    Directory.Delete(oldPath, true);
                 }
                 //上传文件
                 string filePath = Path.Combine(path, newFileName);
@@ -116,25 +111,60 @@ namespace Coltsmart.Portal.Controllers
 
         [HttpPost]
         [Route("api/goods")]
-        public async Task<IResult> Save([FromBody]GoodsModel goods)
+        public async Task<IActionResult> Save([FromBody]GoodsModel goods)
         {
-            if (goods == null)
-                return new ErrorResult<string>("信息无效，请重新提交");
-            //TODO:处理文件
+            if (goods == null) return BadRequest();
 
+            //处理商品主图
+            if (!string.IsNullOrEmpty(goods.picture))
+            {
+                goods.picture = ParseUploadFile(goods.picture);
+            }
+            //处理附件
+            if (goods.downloads != null && goods.downloads.Any())
+            {
+                foreach (var item in goods.downloads)
+                {
+                    item.url = ParseUploadFile(item.url);
+                }
+            }
 
-
-
-            int result = 0;
+            //如果有id，则为修改，否则就是新增。
             if (goods.id > 0)
             {
-                result = await goodsService.Update(goods.ToEntity(), goods.attrs.ToEntity(), goods.downloads.ToEntity());
+                await goodsService.Update(goods.ToEntity(), goods.attrs.ToEntity(), goods.downloads.ToEntity());
             }
             else
             {
-                result = await goodsService.Insert(goods.ToEntity(), goods.attrs.ToEntity(), goods.downloads.ToEntity());
+                await goodsService.Insert(goods.ToEntity(), goods.attrs.ToEntity(), goods.downloads.ToEntity());
             }
-            return new BaseResult<int>(result);
+            return Ok();
+        }
+        // 处理上传文件：从临时上传目录(/upload/temp/yyyymmdd)中删除，移动到正式目录(/upload)下。
+        private string ParseUploadFile(string uriPath)
+        {
+            try
+            {
+                Uri url = new Uri(uriPath);
+                string filePath = url.LocalPath;
+                string fileName = Path.GetFileName(filePath);
+
+                string sourceFilePath = hostingEnvironment.ContentRootPath + filePath;
+                string destFilePath = Path.Combine(hostingEnvironment.ContentRootPath, "upload", fileName);
+                if (File.Exists(sourceFilePath))
+                {
+                    File.Move(sourceFilePath, destFilePath);
+                    return new UriBuilder(url.Scheme,url.Host,url.Port,Path.Combine("upload", fileName)).ToString();
+                }
+                else
+                {
+                    return sourceFilePath;
+                }
+            }
+            catch
+            {
+                return uriPath;
+            }
         }
     }
 }

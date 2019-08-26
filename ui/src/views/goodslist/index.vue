@@ -222,7 +222,10 @@ export default {
         })
         .catch(err => {
           this.table.loading = false;
-          this.error(err.message);
+          this.$message({
+            message: err.message,
+            type: "error"
+          });
         });
     },
     page_change: function(val) {
@@ -237,7 +240,10 @@ export default {
           .delete("/api/goods/" + row.id)
           .then(() => {
             this.table.loading = false;
-            this.$message("删除成功");
+            this.$message({
+              message: "删除成功",
+              type: "error"
+            });
             this.search();
           })
           .catch(error => {
@@ -256,29 +262,24 @@ export default {
       this.$http
         .get("api/goods/" + row.id)
         .then(res => {
-          if (res.data.Type == "Success") {
-            this.table.loading = false;
-            this.item.title = "修改产品信息";
-            this.item.visible = true;
-            this.item.data = res.data.Result;
-          } else {
-            this.table.loading = false;
-            this.$message({
-              message: res.data.Result,
-              type: "error",
-              duration: 0,
-              showClose: true
-            });
-          }
+          this.table.loading = false;
+          this.item.title = "修改产品信息";
+          this.item.visible = true;
+          this.item.data = res.data;
         })
         .catch(error => {
           this.table.loading = false;
-          this.$message({
-            message: error.message,
-            type: "error",
-            duration: 0,
-            showClose: true
-          });
+          if (error.response.status == 400) {
+            this.$message({
+              message: "查询失败，原因是产品编号不正确或不存在",
+              type: "error"
+            });
+          } else {
+            this.$message({
+              message: error.message,
+              type: "error"
+            });
+          }
         });
     },
     addItem: function() {
@@ -320,7 +321,11 @@ export default {
         });
     },
     onAvatarSuccess(res, file) {
-      this.item.data.picture = URL.createObjectURL(file.raw);
+      if (res) {
+        this.item.data.picture = this.serverURL + res.path;
+      } else {
+        this.item.data.picture = URL.createObjectURL(file.raw);
+      }
     },
     beforeAvatarUpload(file) {
       const isLt2M = file.size / 1024 / 1024 < 10;
@@ -331,7 +336,11 @@ export default {
       return isLt2M;
     },
     onFileSuccess(response, file, fileList) {
-      file.url = URL.createObjectURL(file.raw);
+      if (response) {
+        file.url = this.serverURL + response.path;
+      } else {
+        file.url = URL.createObjectURL(file.raw);
+      }
     },
     beforeFileUpload(file) {
       const isLt2M = file.size / 1024 / 1024 < 25;
