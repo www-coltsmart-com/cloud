@@ -25,19 +25,46 @@ namespace Coltsmart.Portal.Controllers
         {
             return await userService.GetUsers(page, size, username);
         }
+        [HttpGet]
+        [Route("api/users/{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            if (id <= 0) return StatusCode(System.Net.HttpStatusCode.BadRequest);
+            var result = await userService.GetUser(id);
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return StatusCode(System.Net.HttpStatusCode.NotFound);
+            }
+        }
 
         [HttpDelete]
         [Route("api/users/{id}")]
-        public async Task<bool> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            return await userService.Delete(id);
+            if (id <= 0) return StatusCode(System.Net.HttpStatusCode.BadRequest);
+            var result = await userService.Delete(id);
+            return result ? Ok() : StatusCode(System.Net.HttpStatusCode.InternalServerError);
         }
 
         [HttpPost]
         [Route("api/users")]
-        public async Task<bool> Create([FromBody]TUser user)
+        public async Task<IActionResult> Save([FromBody]TUser user)
         {
-            return await userService.Create(user);
+            if (user == null || string.IsNullOrEmpty(user.UserName)) return StatusCode(System.Net.HttpStatusCode.BadRequest);
+            bool result = false;
+            if (user.id <= 0)
+            {
+                result = await userService.Create(user);
+            }
+            else
+            {
+                result = await userService.Update(user);
+            }
+            return result ? Ok() : StatusCode(System.Net.HttpStatusCode.InternalServerError);
         }
 
         public string EncryptHelper { get; private set; }

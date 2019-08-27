@@ -31,10 +31,12 @@ namespace ColtSmart.Entity
         /// <summary>
         /// 设备版本
         /// </summary>
+        [Ignore]
         public string Version { get; set; }
         /// <summary>
         /// 串行端口号
         /// </summary>
+        [Ignore]
         public int ComPortNum { get; set; }
     }
 }

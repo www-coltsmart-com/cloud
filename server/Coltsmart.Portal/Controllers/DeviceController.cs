@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System.Web.Http;
 
-// For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Coltsmart.Portal.Controllers
 {
     public class DeviceController : ApiController
@@ -34,9 +32,14 @@ namespace Coltsmart.Portal.Controllers
 
         [HttpDelete]
         [Route("api/devices/{id}")]
-        public async Task<int> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            return await deviceService.Delete(id);
+            if (id <= 0) return BadRequest();
+            var result = await deviceService.Delete(id);
+            if (result)
+                return Ok();
+            else
+                return InternalServerError();
         }
     }
 }

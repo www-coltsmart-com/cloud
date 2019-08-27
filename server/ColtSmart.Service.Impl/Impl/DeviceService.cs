@@ -122,8 +122,8 @@ namespace ColtSmart.Service.Impl
         /// <returns>影响行数</returns>
         public async Task<bool> Delete(int id)
         {
-            var results = await this.sqlExecutor.FindAsync<Device>(new { Id = id });
-            if (results == null || !results.Any()) return false;
+            var results = await this.sqlExecutor.FindAsync<Device>(new { id = id });
+            if (results == null || !results.Any()) return true;
             return await this.sqlExecutor.DeleteAsync(results.First()) > 0;
         }
 

@@ -2,10 +2,10 @@
 DROP TABLE IF EXISTS "public"."tuser";
 CREATE TABLE "public"."tuser" (
 "id" int4 DEFAULT nextval('"User_id_seq"'::regclass) NOT NULL,
-"UserNo" varchar(30) COLLATE "default",
+"UserNo" varchar(50) COLLATE "default",
 "UserName" varchar(100) COLLATE "default",
-"MobilePhone" varchar(20) COLLATE "default",
-"RegEmall" varchar(20) COLLATE "default",
+"MobilePhone" varchar(50) COLLATE "default",
+"RegEmall" varchar(200) COLLATE "default",
 "UserType" int4 NOT NULL,
 "Password" varchar(255) COLLATE "default" NOT NULL,
 "RegDate" date,

@@ -49,7 +49,6 @@ namespace ColtSmart.Service.Impl
             var user = sqlExecutor.Find<TUser>(new { UserNo = usercode }).FirstOrDefault();
             if (user == null) return false;
             var encrptPassword = EncryptHelper.Instance.PassEncryption(user.UserNo, password);
-            string str = EncryptHelper.Instance.PassEncryption(user.UserNo, "654321");
             return user.Password == encrptPassword;
         }
 
@@ -76,10 +75,16 @@ namespace ColtSmart.Service.Impl
             return result.ToPagedResult();
         }
 
+        public async Task<TUser> GetUser(int id)
+        {
+            var results = await sqlExecutor.FindAsync<TUser>(new { id = id });
+            return results.FirstOrDefault();
+        }
+
         public async Task<bool> Delete(int id)
         {
-            var users = await sqlExecutor.FindAsync<TUser>(new { Id = id });
-            if (users == null || !users.Any()) return false;
+            var users = await sqlExecutor.FindAsync<TUser>(new { id = id });
+            if (users == null || !users.Any()) return true;
             var user = users.First();
             return await sqlExecutor.DeleteAsync<TUser>(user) > 0;
         }
@@ -88,12 +93,25 @@ namespace ColtSmart.Service.Impl
         {
             if (user == null || string.IsNullOrEmpty(user.UserNo)) return false;
             var users = await sqlExecutor.FindAsync<TUser>(new { UserNo = user.UserNo });
-            if (users == null || !users.Any()) return false;
+            if (users != null && users.Any()) return false;
             user.UserNo = user.UserNo.Trim();
             user.UserType = EUserType.Admin;//后台手工添加用户为管理员，通过注册用户则为普通用户
             user.Password = ColtSmart.Encrypt.EncryptHelper.Instance.PassEncryption(user.UserNo, "654321");
             user.RegDate = DateTime.Now;
             return await sqlExecutor.InsertAsync<TUser>(user) > 0;
+        }
+
+        public async Task<bool> Update(TUser user)
+        {
+            int result = await sqlExecutor.ExecuteAsync("update tuser set \"UserName\"=@UserName,\"RegEmall\"=@RegEmall,\"MobilePhone\"=@MobilePhone,\"Company\"=@Company where id=@id", new
+            {
+                id = user.id,
+                UserName = user.UserName,
+                RegEmall = user.RegEmall,
+                MobilePhone = user.MobilePhone,
+                Company = user.Company,
+            }, System.Data.CommandType.Text);
+            return result > 0;
         }
 
         public async Task<bool> Register(TUser user)

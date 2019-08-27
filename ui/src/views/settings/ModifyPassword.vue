@@ -26,7 +26,7 @@
           </el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm()" :loading="loading">立即保存</el-button>
+          <el-button type="primary" @click="submitForm()" :loading="loading">修改密码</el-button>
         </el-form-item>
       </el-form>
     </el-tab-pane>
@@ -59,7 +59,7 @@ export default {
     submitForm: function() {
       this.$refs["editForm"].validate(valid => {
         if (valid) {
-          this.$confirm("确认提交吗？", "提示", {}).then(() => {
+          this.$confirm("请确认是否修改原密码吗？", "提示", {}).then(() => {
             this.loading = true;
             this.getPublicKey(publickey => {
               var encrypt = new JSEncrypt();
@@ -74,28 +74,32 @@ export default {
                 .post("/api/login/modifypassword", data)
                 .then(res => {
                   this.loading = false;
-                  if (res.data.Type == "Error") {
-                    this.$message({
-                      message: res.data.Result,
-                      type: "error",
-                      duration: 0,
-                      showClose: true
-                    });
-                  } else {
-                    this.$message({
-                      message: "保存成功",
-                      type: "success"
-                    });
-                  }
+                  this.$message({
+                    message: "密码已被修改，请牢记新密码！",
+                    type: "success"
+                  });
+                  setTimeout(() => {
+                    this.$router.push("/home");
+                  }, 2000);
                 })
                 .catch(error => {
                   this.loading = false;
-                  this.$message({
-                    message: error.message,
-                    type: "error",
-                    duration: 0,
-                    showClose: true
-                  });
+                  if (error.response.status == 400) {
+                    this.$message({
+                      message: "您输入的密码无效，请检查原密码和新密码是否正确",
+                      type: "error"
+                    });
+                  } else if (error.response.status == 500) {
+                    this.$message({
+                      message: "密码修改失败，请重新尝试",
+                      type: "error"
+                    });
+                  } else {
+                    this.$message({
+                      message: error.message,
+                      type: "error"
+                    });
+                  }
                 });
             });
           });

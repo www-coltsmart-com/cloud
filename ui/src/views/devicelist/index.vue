@@ -1,4 +1,3 @@
-
 <template>
   <section>
     <el-col :span="24" class="toolbar">
@@ -27,21 +26,18 @@
       style="width: 100%"
       align="left"
     >
-      <el-table-column prop="DeviceId" label="序列号" width="150" sortable></el-table-column>
-      <el-table-column prop="DeviceType" label="型号" width="100" sortable></el-table-column>
+      <el-table-column prop="DeviceId" label="序列号" width="120" sortable></el-table-column>
+      <el-table-column prop="DeviceType" label="型号" width="90" sortable></el-table-column>
       <el-table-column prop="IsGetway" label="网关" width="80" sortable></el-table-column>
       <el-table-column prop="DeviceName" label="名称" width="100" sortable></el-table-column>
-      <el-table-column label="状态" width="80" sortable>
+      <el-table-column label="状态" width="60" sortable>
         <template slot-scope="scope">
           <span v-if="scope.row.IsOnline" style="color:green">在线</span>
           <span v-if="!scope.row.IsOnline" style="color:red">离线</span>
         </template>
       </el-table-column>
-      <el-table-column prop="InDate" label="接入日期" width="120" :formatter="dateFormatter" sortable></el-table-column>
-      <el-table-column prop="UserOwn" label="使用人" width="100" sortable></el-table-column>
-      <el-table-column prop="Gps" label="GPS坐标" width="100" sortable></el-table-column>
-      <el-table-column prop="Version" label="版本" width="100" sortable></el-table-column>
-      <el-table-column prop="ComPortNum" label="端口" width="100" sortable></el-table-column>
+      <el-table-column prop="InDate" label="接入日期" width="100" :formatter="dateFormatter" sortable></el-table-column>
+      <el-table-column prop="UserOwn" label="使用人" width="90" sortable></el-table-column>
       <el-table-column label="删除" width="80">
         <template slot-scope="scope">
           <el-button size="mini" type="danger" icon="el-icon-delete" @click="handleDel(scope.row)"></el-button>
@@ -57,9 +53,7 @@
         :current-page.sync="page.index"
         :page-size="page.size"
         :total="page.total"
-      >
-        <span>&nbsp;&nbsp;&nbsp; 第{{currentPage}} / {{totalPage}}页</span>
-      </el-pagination>
+      ></el-pagination>
     </el-col>
   </section>
 </template>
@@ -96,10 +90,10 @@ export default {
         .then(() => {
           this.table.loading = true;
           this.$http
-            .delete("/api/devices/" + row.Id)
+            .delete("/api/devices/" + row.id)
             .then(res => {
               this.table.loading = false;
-			  this.$message({
+              this.$message({
                 message: "删除成功!",
                 type: "success"
               });
